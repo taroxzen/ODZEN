@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Rich Background Radial Gradient (Deep Midnight) -->
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="75%">
+      <stop offset="0%" stop-color="#002b4d" />
+      <stop offset="70%" stop-color="#00162b" />
+      <stop offset="100%" stop-color="#000d1a" />
+    </radialGradient>
+
+    <!-- Fluent 3D Lime Gradient for the Ring and Dot (Specular High-End Polish) -->
+    <linearGradient id="fluent3DLime" x1="15%" y1="15%" x2="85%" y2="85%">
+      <stop offset="0%" stop-color="#e6ff80" />  <!-- Highlight -->
+      <stop offset="35%" stop-color="#b4ff00" /> <!-- Base Lime -->
+      <stop offset="75%" stop-color="#80d400" />  <!-- Soft Shadow -->
+      <stop offset="100%" stop-color="#4e8000" /> <!-- Deep Shadow -->
+    </linearGradient>
+
+    <!-- Soft Ambient Glow (Fuzzy Green Halo behind the ring) -->
+    <filter id="softAmbientGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="36" result="blur" />
+    </filter>
+
+    <!-- Symmetric Clean Shadow -->
+    <filter id="cleanShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#000000" flood-opacity="0.5" />
+    </filter>
+  </defs>
+
+  <!-- Arka Plan (Solid Midnight Squircle) -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" stroke="#003357" stroke-width="2" />
+
+  <!-- Arka Plan Yumuşak Yeşil Halesi (Ambient Glow) -->
+  <circle cx="256" cy="256" r="160" fill="#b4ff00" opacity="0.14" filter="url(#softAmbientGlow)" />
+
+  <!-- SMOOTH FLUENT 3D "O" GÖVDESİ -->
+  <g filter="url(#cleanShadow)">
+    <path d="M 256,66 
+             A 190,190 0 1,0 446,256 
+             A 190,190 0 0,0 256,66 Z 
+             M 256,156 
+             A 100,100 0 1,1 156,256 
+             A 100,100 0 0,1 256,156 Z" 
+          fill="url(#fluent3DLime)" />
+  </g>
+
+  <!-- PURE 2D PIXEL ART D-PAD (Sağ Üst Köşe - Boyutu Büyütüldü ve Halkanın Üzerine Tam Dengeli Şekilde Ortaladı) -->
+  <!-- Toplam boyut 72x72 pikselden 96x96 piksele büyütüldü (Oranlar 1.33 kat artırıldı) -->
+  <!-- Merkez koordinatları halkanın sağ üst tepe çizgisi olan (345, 145) noktasına tam ortalandı -->
+  <g transform="translate(325, 95)">
+    <!-- Pixel Outlines (Dark Midnight Border - 96x96px bounding box) -->
+    <path d="M 32,0 H 64 V 32 H 96 V 64 H 64 V 96 H 32 V 64 H 0 V 32 H 32 Z" fill="#000d1a" />
+    
+    <!-- Pixel D-Pad Body (#B4FF00 Lime) -->
+    <path d="M 35,3 H 61 V 35 H 93 V 61 H 61 V 93 H 35 V 61 H 3 V 35 H 35 Z" fill="#b4ff00" />
+
+    <!-- Pixel D-Pad Yön Tuşları (Dengeli Piksel Noktaları - Oranlı 12x12px) -->
+    <!-- Up -->
+    <rect x="42" y="8" width="12" height="12" fill="#00233f" />
+    <!-- Down -->
+    <rect x="42" y="76" width="12" height="12" fill="#00233f" />
+    <!-- Left -->
+    <rect x="8" y="42" width="12" height="12" fill="#00233f" />
+    <!-- Right -->
+    <rect x="76" y="42" width="12" height="12" fill="#00233f" />
+
+    <!-- Center Pivot Tile (#ABE466 Conifer) -->
+    <rect x="42" y="42" width="12" height="12" fill="#abe466" />
+  </g>
+
+  <!-- SMOOTH FLUENT 3D YETTEL NOKTASI ("O.") -->
+  <circle cx="415" cy="415" r="32" fill="url(#fluent3DLime)" filter="url(#cleanShadow)" />
+
+</svg>

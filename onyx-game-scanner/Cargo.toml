@@ -1,0 +1,29 @@
+[package]
+name = "onyx-game-scanner"
+version = "0.1.0"
+edition = "2021"
+authors = ["Taroxzen <https://github.com/taroxzen>"]
+description = "Ultra fast game library scanner for ONYX Launcher"
+repository = "https://github.com/taroxzen/ONYX-Launcher"
+license = "MIT"
+
+[lib]
+name = "onyx_game_scanner"
+path = "src/lib.rs"
+
+[[bin]]
+name = "onyx-game-scanner"
+path = "src/main.rs"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+rayon = "1"
+walkdir = "2"
+rusqlite = { version = "0.32", features = ["bundled"] }
+
+[target.'cfg(windows)'.dependencies]
+winreg = "0.55"

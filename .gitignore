@@ -1,10 +1,34 @@
-﻿bin/
+# Build & Compilation Outputs
+bin/
 obj/
 target/
+dist/
+
+# Visual Studio & IDE configuration
 .vs/
+.idea/
+.vscode/
 *.user
 *.suo
 *.userosscache
 *.sln.docstates
+*.userprefs
+
+# Logs, Crash dumps & Diagnostics
+*.log
+crash.log
+*.dmp
+*.tmp
+*.cache
+*.swp
+*~
+
+# Packaging and intermediate builds
 ONYX_LAUNCHER_FINAL/
+ONYX_INSTALLER_OUTPUT/
 ONYX_GITHUB_READY/
+
+# OS Specific
+Thumbs.db
+Desktop.ini
+.DS_Store

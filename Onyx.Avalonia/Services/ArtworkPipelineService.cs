@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // ONYX Launcher — Cyberpunk Game Library & Platform Hub
 // Developed by Taroxzen (https://github.com/taroxzen)
 // Copyright (c) 2026 Taroxzen. All rights reserved.
@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using Avalonia.Media.Imaging;
 using SkiaSharp;
 
@@ -267,7 +268,7 @@ namespace Onyx.Avalonia.Services
             // Minecraft
             if (normPlat == "minecraft" || normName.Contains("minecraft"))
             {
-                return @"d:\ONYX OYUN KÜTÜPHANESİ\Onyx.Avalonia\Assets\minecraft.ico";
+                return GetAssetPath("minecraft.ico");
             }
 
             // Metin2
@@ -287,7 +288,7 @@ namespace Onyx.Avalonia.Services
                     }
                     catch { }
                 }
-                return @"d:\ONYX OYUN KÜTÜPHANESİ\Onyx.Avalonia\Assets\metin2.ico";
+                return GetAssetPath("metin2.ico");
             }
 
             // Local folder
@@ -307,10 +308,24 @@ namespace Onyx.Avalonia.Services
             return null;
         }
 
+        private static string GetAssetsDir()
+        {
+            string local = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets");
+            if (Directory.Exists(local)) return local;
+            return AppDomain.CurrentDomain.BaseDirectory;
+        }
+
+        private static string GetAssetPath(string fileName)
+        {
+            string local = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", fileName);
+            if (File.Exists(local)) return local;
+            return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
+        }
+
         private static string? MatchBuiltInArtworkBank(string platform, string gameId, string gameName)
         {
             string low = $"{gameId} {gameName}".ToLowerInvariant();
-            string assetsDir = @"d:\ONYX OYUN KÜTÜPHANESİ\Onyx.Avalonia\Assets";
+            string assetsDir = GetAssetsDir();
 
             if (low.Contains("minecraft")) return Path.Combine(assetsDir, "minecraft.ico");
             if (low.Contains("metin2") || low.Contains("rinamt2")) return Path.Combine(assetsDir, "metin2.ico");
@@ -415,11 +430,14 @@ namespace Onyx.Avalonia.Services
 
         private static string Sanitize(string name)
         {
-            foreach (char c in Path.GetInvalidFileNameChars())
+            if (string.IsNullOrWhiteSpace(name)) return "unknown";
+            string clean = Regex.Replace(name, @"[^a-zA-Z0-9_\-]", "_").Trim('_');
+            if (string.IsNullOrEmpty(clean))
             {
-                name = name.Replace(c, '_');
+                using var sha = System.Security.Cryptography.SHA256.Create();
+                return Convert.ToHexString(sha.ComputeHash(System.Text.Encoding.UTF8.GetBytes(name))).ToLowerInvariant();
             }
-            return name;
+            return clean;
         }
 
         [DllImport("shell32.dll", CharSet = CharSet.Auto)]

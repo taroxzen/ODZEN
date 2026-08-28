@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // ONYX Launcher — Cyberpunk Game Library & Platform Hub
 // Developed by Taroxzen (https://github.com/taroxzen)
 // Copyright (c) 2026 Taroxzen. All rights reserved.
@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Onyx.Avalonia.Models;
@@ -27,16 +28,36 @@ namespace Onyx.Avalonia.Services
             }
         }
 
+        private static string? FindScannerExe()
+        {
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            string[] candidates = {
+                Path.Combine(baseDir, "onyx-game-scanner.exe"),
+                Path.Combine(baseDir, "..", "onyx-game-scanner.exe"),
+                Path.Combine(baseDir, "..", "..", "onyx-game-scanner.exe"),
+                Path.Combine(baseDir, "..", "..", "..", "onyx-game-scanner.exe"),
+                Path.Combine(baseDir, "..", "..", "target", "release", "onyx-game-scanner.exe"),
+                Path.Combine(baseDir, "..", "..", "onyx-game-scanner", "target", "release", "onyx-game-scanner.exe"),
+            };
+
+            foreach (var c in candidates)
+            {
+                try
+                {
+                    string full = Path.GetFullPath(c);
+                    if (File.Exists(full)) return full;
+                }
+                catch { }
+            }
+            return null;
+        }
+
         public async Task<List<GameItem>> ScanGamesAsync()
         {
             var scanned = new List<GameItem>();
-            string exePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "onyx-game-scanner.exe");
-            if (!File.Exists(exePath))
-            {
-                exePath = @"d:\ONYX OYUN KÜTÜPHANESİ\onyx-game-scanner.exe";
-            }
+            string? exePath = FindScannerExe();
 
-            if (File.Exists(exePath))
+            if (!string.IsNullOrEmpty(exePath) && File.Exists(exePath))
             {
                 try
                 {
@@ -147,20 +168,40 @@ namespace Onyx.Avalonia.Services
                             return (false, $"⚠️ Oyun dosyası bulunamadı: {game.Launch.Path}");
                         }
 
-                        var psi = new ProcessStartInfo
+                        string workDir = !string.IsNullOrWhiteSpace(game.Launch.Cwd) && Directory.Exists(game.Launch.Cwd)
+                            ? game.Launch.Cwd
+                            : Path.GetDirectoryName(game.Launch.Path) ?? "";
+
+                        try
                         {
-                            FileName = game.Launch.Path,
-                            WorkingDirectory = !string.IsNullOrWhiteSpace(game.Launch.Cwd) && Directory.Exists(game.Launch.Cwd)
-                                ? game.Launch.Cwd
-                                : Path.GetDirectoryName(game.Launch.Path) ?? "",
-                            UseShellExecute = true
-                        };
-                        if (game.Launch.Args != null && game.Launch.Args.Count > 0)
-                        {
-                            foreach (var a in game.Launch.Args) psi.ArgumentList.Add(a);
+                            var psi = new ProcessStartInfo
+                            {
+                                FileName = game.Launch.Path,
+                                WorkingDirectory = workDir,
+                                UseShellExecute = false
+                            };
+                            if (game.Launch.Args != null && game.Launch.Args.Count > 0)
+                            {
+                                foreach (var a in game.Launch.Args) psi.ArgumentList.Add(a);
+                            }
+                            Process.Start(psi);
+                            return (true, $"🚀 {game.Name} başlatılıyor...");
                         }
-                        Process.Start(psi);
-                        return (true, $"🚀 {game.Name} başlatılıyor...");
+                        catch
+                        {
+                            var psiFallback = new ProcessStartInfo
+                            {
+                                FileName = game.Launch.Path,
+                                WorkingDirectory = workDir,
+                                UseShellExecute = true
+                            };
+                            if (game.Launch.Args != null && game.Launch.Args.Count > 0)
+                            {
+                                psiFallback.Arguments = string.Join(" ", game.Launch.Args.Select(a => $"\"{a.Replace("\"", "\\\"")}\""));
+                            }
+                            Process.Start(psiFallback);
+                            return (true, $"🚀 {game.Name} başlatılıyor...");
+                        }
                     }
                 }
 

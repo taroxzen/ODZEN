@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // ONYX Launcher — Cyberpunk Game Library & Platform Hub
 // Developed by Taroxzen (https://github.com/taroxzen)
 // Copyright (c) 2026 Taroxzen. All rights reserved.
@@ -8,6 +8,7 @@ using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using Avalonia.Media.Imaging;
 
 namespace Onyx.Avalonia.Services
@@ -118,7 +119,7 @@ namespace Onyx.Avalonia.Services
             // Minecraft
             if (platform.Equals("minecraft", StringComparison.OrdinalIgnoreCase) || lowId.Contains("minecraft"))
             {
-                string assetIco = @"d:\ONYX OYUN KÜTÜPHANESİ\Onyx.Avalonia\Assets\minecraft.ico";
+                string assetIco = GetAssetPath("minecraft.ico");
                 if (File.Exists(assetIco))
                 {
                     var bmp = LoadBitmapAndCache(assetIco, cachedPng);
@@ -143,7 +144,7 @@ namespace Onyx.Avalonia.Services
                     }
                 }
 
-                string assetIco = @"d:\ONYX OYUN KÜTÜPHANESİ\Onyx.Avalonia\Assets\metin2.ico";
+                string assetIco = GetAssetPath("metin2.ico");
                 if (File.Exists(assetIco))
                 {
                     var bmp = LoadBitmapAndCache(assetIco, cachedPng);
@@ -189,7 +190,7 @@ namespace Onyx.Avalonia.Services
                     catch { }
                 }
 
-                string assetIco = @"d:\ONYX OYUN KÜTÜPHANESİ\Onyx.Avalonia\Assets\xbox.ico";
+                string assetIco = GetAssetPath("xbox.ico");
                 if (File.Exists(assetIco))
                 {
                     var bmp = LoadBitmapAndCache(assetIco, cachedPng);
@@ -277,13 +278,23 @@ namespace Onyx.Avalonia.Services
             return null;
         }
 
+        private static string GetAssetPath(string fileName)
+        {
+            string local = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", fileName);
+            if (File.Exists(local)) return local;
+            return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
+        }
+
         private static string SanitizeFileName(string name)
         {
-            foreach (char c in Path.GetInvalidFileNameChars())
+            if (string.IsNullOrWhiteSpace(name)) return "unknown";
+            string clean = Regex.Replace(name, @"[^a-zA-Z0-9_\-]", "_").Trim('_');
+            if (string.IsNullOrEmpty(clean))
             {
-                name = name.Replace(c, '_');
+                using var sha = System.Security.Cryptography.SHA256.Create();
+                return Convert.ToHexString(sha.ComputeHash(System.Text.Encoding.UTF8.GetBytes(name))).ToLowerInvariant();
             }
-            return name;
+            return clean;
         }
 
         [DllImport("shell32.dll", CharSet = CharSet.Auto)]

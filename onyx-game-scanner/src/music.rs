@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // ONYX Launcher — Game Scanner Engine (Rust Core)
 // Developed by Taroxzen (https://github.com/taroxzen)
 // Copyright (c) 2026 Taroxzen. All rights reserved.
@@ -96,8 +96,8 @@ impl MusicApp {
     fn open_uri_or_url(target: &str) -> Result<(), String> {
         #[cfg(windows)]
         {
-            Command::new("cmd")
-                .args(["/C", "start", "", target])
+            Command::new("rundll32")
+                .args(["url.dll,FileProtocolHandler", target])
                 .spawn()
                 .map_err(|e| format!("URL/URI açılamadı ({target}): {e}"))?;
             Ok(())

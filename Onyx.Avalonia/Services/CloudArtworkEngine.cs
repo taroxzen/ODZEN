@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // ONYX Launcher — Cyberpunk Game Library & Platform Hub
 // Developed by Taroxzen (https://github.com/taroxzen)
 // Copyright (c) 2026 Taroxzen. All rights reserved.
@@ -32,6 +32,7 @@ namespace Onyx.Avalonia.Services
                 if (!Directory.Exists(CloudCacheDir))
                     Directory.CreateDirectory(CloudCacheDir);
 
+                _httpClient.MaxResponseContentBufferSize = 10 * 1024 * 1024;
                 _httpClient.DefaultRequestHeaders.Clear();
                 _httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
                 _httpClient.DefaultRequestHeaders.Add("Accept", "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8");
@@ -225,11 +226,14 @@ namespace Onyx.Avalonia.Services
 
         private static string Sanitize(string name)
         {
-            foreach (char c in Path.GetInvalidFileNameChars())
+            if (string.IsNullOrWhiteSpace(name)) return "unknown";
+            string clean = Regex.Replace(name, @"[^a-zA-Z0-9_\-]", "_").Trim('_');
+            if (string.IsNullOrEmpty(clean))
             {
-                name = name.Replace(c, '_');
+                using var sha = System.Security.Cryptography.SHA256.Create();
+                return Convert.ToHexString(sha.ComputeHash(System.Text.Encoding.UTF8.GetBytes(name))).ToLowerInvariant();
             }
-            return name;
+            return clean;
         }
     }
 }

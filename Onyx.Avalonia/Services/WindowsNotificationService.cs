@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // ONYX Launcher — Cyberpunk Game Library & Platform Hub
 // Developed by Taroxzen (https://github.com/taroxzen)
 // Copyright (c) 2026 Taroxzen. All rights reserved.
@@ -18,20 +18,27 @@ namespace Onyx.Avalonia.Services
 
             try
             {
-                // PowerShell üzerinden Windows Yerel Toast / Balon bildirimi gönderir
+                // PowerShell üzerinden Windows Yerel Toast / Balon bildirimi gönderir (Enjeksiyon korumalı Base64)
+                string safeTitleB64 = Convert.ToBase64String(System.Text.Encoding.Unicode.GetBytes(title ?? string.Empty));
+                string safeMessageB64 = Convert.ToBase64String(System.Text.Encoding.Unicode.GetBytes(message ?? string.Empty));
+
                 string psScript = $@"[Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] > $null
 $template = [Windows.UI.Notifications.ToastNotificationManager]::GetTemplateContent([Windows.UI.Notifications.ToastTemplateType]::ToastText02)
 $textNodes = $template.GetElementsByTagName('text')
-$textNodes.Item(0).AppendChild($template.CreateTextNode('{title.Replace("'", "''")}')) > $null
-$textNodes.Item(1).AppendChild($template.CreateTextNode('{message.Replace("'", "''")}')) > $null
+$t = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String('{safeTitleB64}'))
+$m = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String('{safeMessageB64}'))
+$textNodes.Item(0).AppendChild($template.CreateTextNode($t)) > $null
+$textNodes.Item(1).AppendChild($template.CreateTextNode($m)) > $null
 $toast = [Windows.UI.Notifications.ToastNotification]::new($template)
 $notifier = [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier('ONYX.Launcher')
 $notifier.Show($toast)";
 
+                string encodedCommand = Convert.ToBase64String(System.Text.Encoding.Unicode.GetBytes(psScript));
+
                 var psi = new ProcessStartInfo
                 {
                     FileName = "powershell.exe",
-                    Arguments = $"-NoProfile -WindowStyle Hidden -Command \"{psScript}\"",
+                    Arguments = $"-NoProfile -NonInteractive -WindowStyle Hidden -EncodedCommand {encodedCommand}",
                     UseShellExecute = false,
                     CreateNoWindow = true
                 };

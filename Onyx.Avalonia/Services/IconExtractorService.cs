@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // ONYX Launcher — Cyberpunk Game Library & Platform Hub
 // Developed by Taroxzen (https://github.com/taroxzen)
 // Copyright (c) 2026 Taroxzen. All rights reserved.
@@ -8,6 +8,7 @@ using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using Avalonia.Media.Imaging;
 
 namespace Onyx.Avalonia.Services
@@ -93,11 +94,14 @@ namespace Onyx.Avalonia.Services
 
         private static string SanitizeFileName(string name)
         {
-            foreach (char c in Path.GetInvalidFileNameChars())
+            if (string.IsNullOrWhiteSpace(name)) return "unknown";
+            string clean = Regex.Replace(name, @"[^a-zA-Z0-9_\-]", "_").Trim('_');
+            if (string.IsNullOrEmpty(clean))
             {
-                name = name.Replace(c, '_');
+                using var sha = System.Security.Cryptography.SHA256.Create();
+                return Convert.ToHexString(sha.ComputeHash(System.Text.Encoding.UTF8.GetBytes(name))).ToLowerInvariant();
             }
-            return name;
+            return clean;
         }
 
         [DllImport("shell32.dll", CharSet = CharSet.Auto)]

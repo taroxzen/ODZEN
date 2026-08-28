@@ -1,43 +1,34 @@
-﻿# 🎨 Artwork & Customization Pipeline
+﻿> 🇹🇷 **Türkçe** | 🇬🇧 [[Artwork-&-Customization-EN|Switch to English]]
 
-ONYX Launcher includes a multi-tiered artwork pipeline that ensures every game in your library has crisp, high-resolution visual branding.
+# 🎨 Görsel ve Logo Motoru
+
+ONYX Launcher, kütüphanenizdeki her oyunun en yüksek kalitede logoya ve kapağa sahip olmasını sağlayan çok aşamalı bir görsel işlem hattı barındırır.
 
 ---
 
-## 🖼️ Multi-Tier Artwork Resolution Pipeline
+## 🖼️ Çok Kademeli Görsel Pipeline
 
 `mermaid
 graph TD
-    Game[Detected Game] --> CheckLocal[1. Local High-Res Icon/Asset Extraction]
-    CheckLocal -->|Found| Cache[Save to %LOCALAPPDATA%/ONYX/icons]
-    CheckLocal -->|Not Found| CheckSteamGrid[2. SteamGridDB Open API Engine]
-    CheckSteamGrid -->|Found| Crop[3. SkiaSharp Smart Transparent Crop]
-    CheckSteamGrid -->|Not Found| CheckDuckDuckGo[4. DuckDuckGo PNG Logo Scraper]
-    CheckDuckDuckGo -->|Found| Crop
-    CheckDuckDuckGo -->|Not Found| BuiltIn[5. Built-in High-Res Vector SVG Platform Icons]
+    Game[Tespit Edilen Oyun] --> CheckLocal[1. Yerel Yüksek Çözünürlüklü İkon / Dosya Çıkarma]
+    CheckLocal -->|Bulundu| Cache[%LOCALAPPDATA%/ONYX/icons İçine Kaydet]
+    CheckLocal -->|Bulunamadı| CheckSteamGrid[2. SteamGridDB Açık API Motoru]
+    CheckSteamGrid -->|Bulundu| Crop[3. SkiaSharp Akıllı Şeffaf Kenar Kırpma]
+    CheckSteamGrid -->|Bulunamadı| CheckDuckDuckGo[4. DuckDuckGo PNG Logo Scraper]
+    CheckDuckDuckGo -->|Bulundu| Crop
+    CheckDuckDuckGo -->|Bulunamadı| BuiltIn[5. Dahili Vektörel SVG Platform İkonları]
     Crop --> Cache
-    BuiltIn --> Render[Render Avalonia Bitmap]
+    BuiltIn --> Render[Avalonia Arayüzünde Göster]
     Cache --> Render
 `
 
 ---
 
-## ✂️ SkiaSharp Smart Transparent Cropping
+## ✂️ SkiaSharp Akıllı Şeffaf Kenar Kırpma
 
-Many game logos downloaded from public web sources contain unwanted empty transparent margins or black rectangular borders.
+İnternetten indirilen oyun logoları genellikle kenarlarında gereksiz boş şeffaf alanlar veya siyah çerçeveler barındırır.
 
-ONYX Launcher includes an integrated **SkiaSharp** post-processing filter:
-1. Iterates over bitmap pixels to determine the precise bounding box [minX, minY, maxX, maxY] of visible, non-transparent pixels.
-2. Crops out redundant transparent padding.
-3. Automatically normalizes aspect ratios so logos look visually aligned inside cards and banners.
-
----
-
-## 💾 Local Cache Directories
-
-Artwork is cached locally to prevent redundant network requests:
-* **Game Icons:** %LOCALAPPDATA%\ONYX\icons\
-* **SteamGridDB Logos:** %LOCALAPPDATA%\ONYX\steamgriddb_logos\
-* **Cloud Cached Art:** %LOCALAPPDATA%\ONYX\cloud_artwork\
-
-All filenames are strictly sanitized using alphanumeric regex and SHA-256 to prevent path traversal.
+ONYX Launcher içerisindeki **SkiaSharp** motoru:
+1. Görseldeki görünür pikselleri tarar.
+2. Fazlalık boş şeffaf kenar boşluklarını otomatik olarak kırpar.
+3. Kartlar ve afişler içinde logonun her zaman tam hizalı ve orantılı görünmesini sağlar.

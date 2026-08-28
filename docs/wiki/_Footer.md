@@ -1,2 +1,2 @@
 ﻿---
-**ONYX Launcher** • Developed by [Taroxzen](https://github.com/taroxzen) • Licensed under [MIT License](https://github.com/taroxzen/ONYX-Launcher/blob/main/LICENSE)
+**ONYX Launcher** • Geliştirici / Developed by [Taroxzen](https://github.com/taroxzen) • [MIT Lisansı](https://github.com/taroxzen/ONYX-Launcher/blob/main/LICENSE)

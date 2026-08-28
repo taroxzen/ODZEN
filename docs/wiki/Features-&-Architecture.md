@@ -1,47 +1,42 @@
-﻿# ⚙️ Features & Architecture
+﻿> 🇹🇷 **Türkçe** | 🇬🇧 [[Features-&-Architecture-EN|Switch to English]]
 
-ONYX Launcher is architected with a decoupled, high-performance hybrid model:
-1. **Frontend Presentation & Interaction:** C# .NET 10 using Avalonia UI and CommunityToolkit.Mvvm.
-2. **Core Scanning & Registry Extraction Engine:** Standalone native binary written in Rust (onyx-game-scanner.exe).
+# ⚙️ Özellikler ve Mimari
+
+ONYX Launcher, modern masaüstü teknolojilerini bir araya getiren hibrit bir mimari üzerine kurulmuştur:
+1. **Kullanıcı Arayüzü & Sunum:** Avalonia UI (.NET 10) ve CommunityToolkit.Mvvm ile C# tabanlı yüksek performanslı MVVM yapısı.
+2. **Çekirdek Tarayıcı Motoru:** Doğrudan yerel makine koduna derlenen Rust (onyx-game-scanner.exe).
 
 ---
 
-## 🏗️ Architectural Overview
+## 🏗️ Mimari Şema
 
 `mermaid
 sequenceDiagram
-    participant UI as Avalonia Frontend (C#)
-    participant Core as Scanner Core (Rust)
-    participant Disk as OS Filesystem / Registry
-    participant CDN as SteamGridDB / Cloud CDN
+    participant UI as Avalonia Arayüzü (C#)
+    participant Core as Tarayıcı Çekirdeği (Rust)
+    participant Disk as Dosya Sistemi / Kayıt Defteri
+    participant CDN as SteamGridDB / Bulut CDN
 
     UI->>Core: Process.Start("onyx-game-scanner.exe scan --json")
-    Core->>Disk: Query Steam VDF, Registry HKLM/HKCU, SQLite DBs
-    Disk-->>Core: Raw Platform Data
-    Core-->>UI: Structured Game JSON Stream
-    UI->>UI: Bind to ObservableCollection<GameItem>
-    UI->>CDN: Async Logo & Artwork Pipeline
-    CDN-->>UI: Cache PNGs & Render SkiaSharp Bitmaps
+    Core->>Disk: Steam VDF, Kayıt Defteri HKLM/HKCU, SQLite DB Sorguları
+    Disk-->>Core: Ham Platform Verileri
+    Core-->>UI: Yapılandırılmış JSON Akışı
+    UI->>UI: ObservableCollection<GameItem> Bağlama
+    UI->>CDN: Asenkron Logo & Görsel İndirme
+    CDN-->>UI: PNG Önbelleği & SkiaSharp Çizimi
 `
 
 ---
 
-## 🧩 Key Subsystems
+## 🧩 Temel Alt Sistemler
 
-### 1. The Rust Scanner Engine (onyx-game-scanner)
-* **Pure Native Performance:** Compiled to zero-overhead machine code.
-* **Direct OS Registry & Filesystem Access:** Reads Windows Registry keys via winreg, parses Valve Data Format (df), deserializes Epic Games .item manifests, and inspects GOG SQLite databases.
-* **JSON Streaming:** Outputs clean JSON adhering to strict models for launch targets, executables, categories, and estimated file sizes.
+### 1. Rust Tarama Motoru (onyx-game-scanner)
+* **Sıfır Gecikme:** C# tarafına yük bindirmeden doğrudan Windows Registry, Steam VDF ve SQLite veri tabanlarını okur.
+* **JSON Çıktısı:** Tespit edilen tüm oyunları standart bir veri yapısıyla arayüze iletir.
 
-### 2. Avalonia UI Frontend & MVVM Pattern
-* **Reactive MVVM:** Powered by CommunityToolkit.Mvvm (ObservableObject, RelayCommand).
-* **Cross-Resolution Cyberpunk UI:** Custom vector SVG assets, Fluent styling, neon glow accents, and responsive grid layouts.
-* **Virtualization:** High-performance item virtualizing controls ensure silky smooth 60–144 FPS scrolling even with 1,000+ games.
+### 2. Avalonia UI & MVVM Altyapısı
+* **Vektörel Siberpunk Arayüz:** Tüm çözünürlüklerde keskin kalan SVG ikonlar ve pürüzsüz animasyonlar.
+* **Sanal Liste (Virtualization):** 1000+ oyunlu dev kütüphanelerde dahi 60–144 FPS akıcı kaydırma.
 
-### 3. Memory Optimizer Service (MemoryOptimizerService.cs)
-* **Automatic Working Set Trimming:** Leverages SetProcessWorkingSetSize and .NET 10 GC adaptation modes.
-* **Minimization Cleanup:** When ONYX Launcher is minimized to the system tray, memory is trimmed immediately, reducing RAM footprint to <20 MB.
-
-### 4. Audio Hub Integration (MusicService.cs)
-* Integrated quick-access links for Spotify, Apple Music, YouTube Music, Deezer, and Tidal.
-* Launches via hardened Windows undll32 url.dll,FileProtocolHandler calls.
+### 3. Bellek Optimizasyon Servisi (MemoryOptimizerService.cs)
+* **Otomatik RAM Boşaltma:** Launcher tepsiye küçültüldüğünde veya boşa çıktığında gereksiz bellek alanını Windows'a geri iade eder (<20 MB).

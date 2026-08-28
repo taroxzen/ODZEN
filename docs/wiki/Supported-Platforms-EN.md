@@ -1,4 +1,4 @@
-﻿> 🇬🇧 **English** | 🇹🇷 [[Supported-Platforms|Türkçe'ye Geç]]
+﻿> 🇬🇧 **English** | 🇹🇷 [Türkçe'ye Geç](Supported-Platforms)
 
 # 🕹️ Supported Platforms & Detection Mechanics
 

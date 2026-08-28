@@ -1,4 +1,4 @@
-﻿> 🇹🇷 **Türkçe** | 🇬🇧 [[Features-&-Architecture-EN|Switch to English]]
+﻿> 🇹🇷 **Türkçe** | 🇬🇧 [Switch to English](Features-&-Architecture-EN)
 
 # ⚙️ Özellikler ve Mimari
 

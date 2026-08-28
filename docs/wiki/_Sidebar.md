@@ -1,24 +1,24 @@
 ﻿### 🇹🇷 Türkçe Dokümantasyon
-* [[Home|🏠 Ana Sayfa]]
-* [[Getting-Started|🚀 Başlangıç Rehberi]]
-* [[Features-&-Architecture|⚙️ Özellikler ve Mimari]]
-* [[Supported-Platforms|🕹️ Desteklenen Platformlar]]
-* [[Artwork-&-Customization|🎨 Görsel ve Logo Motoru]]
-* [[Hardware-Monitor-&-Performance|📊 Donanım İzleme]]
-* [[Security-&-Privacy|🛡️ Güvenlik ve Gizlilik]]
-* [[Troubleshooting-&-FAQ|❓ Sorun Giderme & SSS]]
+* [🏠 Ana Sayfa](Home)
+* [🚀 Başlangıç Rehberi](Getting-Started)
+* [⚙️ Özellikler ve Mimari](Features-&-Architecture)
+* [🕹️ Desteklenen Platformlar](Supported-Platforms)
+* [🎨 Görsel ve Logo Motoru](Artwork-&-Customization)
+* [📊 Donanım İzleme & Performans](Hardware-Monitor-&-Performance)
+* [🛡️ Güvenlik ve Gizlilik](Security-&-Privacy)
+* [❓ Sorun Giderme & SSS](Troubleshooting-&-FAQ)
 
 ---
 
 ### 🇬🇧 English Docs
-* [[Home-EN|🏠 Home (EN)]]
-* [[Getting-Started-EN|🚀 Getting Started (EN)]]
-* [[Features-&-Architecture-EN|⚙️ Features (EN)]]
-* [[Supported-Platforms-EN|🕹️ Platforms (EN)]]
-* [[Artwork-&-Customization-EN|🎨 Artwork Engine (EN)]]
-* [[Hardware-Monitor-&-Performance-EN|📊 Hardware Monitor (EN)]]
-* [[Security-&-Privacy-EN|🛡️ Security (EN)]]
-* [[Troubleshooting-&-FAQ-EN|❓ FAQ & Troubleshooting (EN)]]
+* [🏠 Home (EN)](Home-EN)
+* [🚀 Getting Started (EN)](Getting-Started-EN)
+* [⚙️ Features & Architecture (EN)](Features-&-Architecture-EN)
+* [🕹️ Supported Platforms (EN)](Supported-Platforms-EN)
+* [🎨 Artwork Engine (EN)](Artwork-&-Customization-EN)
+* [📊 Hardware Monitor (EN)](Hardware-Monitor-&-Performance-EN)
+* [🛡️ Security & Privacy (EN)](Security-&-Privacy-EN)
+* [❓ Troubleshooting & FAQ (EN)](Troubleshooting-&-FAQ-EN)
 
 ---
 

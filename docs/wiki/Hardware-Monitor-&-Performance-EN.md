@@ -1,4 +1,4 @@
-﻿> 🇬🇧 **English** | 🇹🇷 [[Hardware-Monitor-&-Performance|Türkçe'ye Geç]]
+﻿> 🇬🇧 **English** | 🇹🇷 [Türkçe'ye Geç](Hardware-Monitor-&-Performance)
 
 # 📊 Hardware Monitor & Performance
 

@@ -1,4 +1,4 @@
-﻿> 🇬🇧 **English** | 🇹🇷 [[Home|Türkçe'ye Geç]]
+﻿> 🇬🇧 **English** | 🇹🇷 [Türkçe'ye Geç](Home)
 
 # 🎮 Welcome to the ONYX Launcher Wiki
 
@@ -32,13 +32,13 @@ graph TD
 
 | Guide | Description |
 | :--- | :--- |
-| 🚀 **[[Getting-Started-EN|Getting Started]]** | System requirements, installation methods (Installer vs Portable), and first launch. |
-| ⚙️ **[[Features-&-Architecture-EN|Features & Architecture]]** | Deep dive into the architecture, MVVM design, Rust scanning engine, and memory optimization. |
-| 🕹️ **[[Supported-Platforms-EN|Supported Platforms]]** | Detailed list of supported platforms (Steam, Epic, EA, Ubisoft, GOG, Battle.net, Xbox, Minecraft, etc.). |
-| 🎨 **[[Artwork-&-Customization-EN|Artwork & Customization]]** | High-res logo retrieval, smart transparent border cropping with SkiaSharp, and custom covers. |
-| 📊 **[[Hardware-Monitor-&-Performance-EN|Hardware Monitor & Performance]]** | Sidebar CPU, RAM, GPU, and VRAM monitoring, zero-overhead idle trimming. |
-| 🛡️ **[[Security-&-Privacy-EN|Security & Privacy]]** | Security audit details, script injection prevention, path traversal defense, and local privacy. |
-| ❓ **[[Troubleshooting-&-FAQ-EN|Troubleshooting & FAQ]]** | Solutions for missing games, scanner paths, notification troubleshooting, and FAQs. |
+| 🚀 **[Getting Started](Getting-Started-EN)** | System requirements, installation methods (Installer vs Portable), and first launch. |
+| ⚙️ **[Features & Architecture](Features-&-Architecture-EN)** | Deep dive into the architecture, MVVM design, Rust scanning engine, and memory optimization. |
+| 🕹️ **[Supported Platforms](Supported-Platforms-EN)** | Detailed list of supported platforms (Steam, Epic, EA, Ubisoft, GOG, Battle.net, Xbox, Minecraft, etc.). |
+| 🎨 **[Artwork & Customization](Artwork-&-Customization-EN)** | High-res logo retrieval, smart transparent border cropping with SkiaSharp, and custom covers. |
+| 📊 **[Hardware Monitor & Performance](Hardware-Monitor-&-Performance-EN)** | Sidebar CPU, RAM, GPU, and VRAM monitoring, zero-overhead idle trimming. |
+| 🛡️ **[Security & Privacy](Security-&-Privacy-EN)** | Security audit details, script injection prevention, path traversal defense, and local privacy. |
+| ❓ **[Troubleshooting & FAQ](Troubleshooting-&-FAQ-EN)** | Solutions for missing games, scanner paths, notification troubleshooting, and FAQs. |
 
 ---
 

@@ -1,4 +1,4 @@
-﻿> 🇬🇧 **English** | 🇹🇷 [[Artwork-&-Customization|Türkçe'ye Geç]]
+﻿> 🇬🇧 **English** | 🇹🇷 [Türkçe'ye Geç](Artwork-&-Customization)
 
 # 🎨 Artwork & Customization Pipeline
 

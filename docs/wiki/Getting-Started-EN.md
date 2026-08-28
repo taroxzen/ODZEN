@@ -1,4 +1,4 @@
-﻿> 🇬🇧 **English** | 🇹🇷 [[Getting-Started|Türkçe'ye Geç]]
+﻿> 🇬🇧 **English** | 🇹🇷 [Türkçe'ye Geç](Getting-Started)
 
 # 🚀 Getting Started
 

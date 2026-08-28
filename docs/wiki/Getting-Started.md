@@ -1,4 +1,4 @@
-﻿> 🇹🇷 **Türkçe** | 🇬🇧 [[Getting-Started-EN|Switch to English]]
+﻿> 🇹🇷 **Türkçe** | 🇬🇧 [Switch to English](Getting-Started-EN)
 
 # 🚀 Başlangıç Rehberi
 

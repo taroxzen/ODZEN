@@ -1,4 +1,4 @@
-﻿> 🇬🇧 **English** | 🇹🇷 [[Troubleshooting-&-FAQ|Türkçe'ye Geç]]
+﻿> 🇬🇧 **English** | 🇹🇷 [Türkçe'ye Geç](Troubleshooting-&-FAQ)
 
 # ❓ Troubleshooting & Frequently Asked Questions (FAQ)
 

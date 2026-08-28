@@ -1,4 +1,4 @@
-﻿> 🇹🇷 **Türkçe (Varsayılan)** | 🇬🇧 [[Home-EN|Switch to English]]
+﻿> 🇹🇷 **Türkçe (Varsayılan)** | 🇬🇧 [Switch to English](Home-EN)
 
 # 🎮 ONYX Launcher Wiki'sine Hoş Geldiniz
 
@@ -32,13 +32,13 @@ graph TD
 
 | Bölüm | Açıklama |
 | :--- | :--- |
-| 🚀 **[[Getting-Started|Başlangıç Rehberi]]** | Sistem gereksinimleri, kurulum seçenekleri (Setup vs Taşınabilir) ve ilk çalıştırma. |
-| ⚙️ **[[Features-&-Architecture|Özellikler ve Mimari]]** | MVVM mimarisi, Rust tarayıcı motoru ve bellek optimizasyonu detayları. |
-| 🕹️ **[[Supported-Platforms|Desteklenen Platformlar]]** | 10'dan fazla platformun tespit kuralları ve başlatma protokolleri. |
-| 🎨 **[[Artwork-&-Customization|Görsel ve Logo Motoru]]** | SteamGridDB, DuckDuckGo scraper ve SkiaSharp akıllı şeffaf kırpma sistemi. |
-| 📊 **[[Hardware-Monitor-&-Performance|Donanım İzleme]]** | Yan panelde anlık CPU, RAM, GPU ve VRAM kullanımı; sıfır arka plan yükü. |
-| 🛡️ **[[Security-&-Privacy|Güvenlik ve Gizlilik]]** | Komut enjeksiyonu önlemleri, path traversal koruması ve sıfır telemetri garantisi. |
-| ❓ **[[Troubleshooting-&-FAQ|Sorun Giderme & SSS]]** | Sık karşılaşılan sorular ve hata çözüm adımları. |
+| 🚀 **[Başlangıç Rehberi](Getting-Started)** | Sistem gereksinimleri, kurulum seçenekleri (Setup vs Taşınabilir) ve ilk çalıştırma. |
+| ⚙️ **[Özellikler ve Mimari](Features-&-Architecture)** | MVVM mimarisi, Rust tarayıcı motoru ve bellek optimizasyonu detayları. |
+| 🕹️ **[Desteklenen Platformlar](Supported-Platforms)** | 10'dan fazla platformun tespit kuralları ve başlatma protokolleri. |
+| 🎨 **[Görsel ve Logo Motoru](Artwork-&-Customization)** | SteamGridDB, DuckDuckGo scraper ve SkiaSharp akıllı şeffaf kırpma sistemi. |
+| 📊 **[Donanım İzleme](Hardware-Monitor-&-Performance)** | Yan panelde anlık CPU, RAM, GPU ve VRAM kullanımı; sıfır arka plan yükü. |
+| 🛡️ **[Güvenlik ve Gizlilik](Security-&-Privacy)** | Komut enjeksiyonu önlemleri, path traversal koruması ve sıfır telemetri garantisi. |
+| ❓ **[Sorun Giderme & SSS](Troubleshooting-&-FAQ)** | Sık karşılaşılan sorular ve hata çözüm adımları. |
 
 ---
 

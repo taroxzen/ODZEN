@@ -1,4 +1,4 @@
-﻿> 🇹🇷 **Türkçe** | 🇬🇧 [[Supported-Platforms-EN|Switch to English]]
+﻿> 🇹🇷 **Türkçe** | 🇬🇧 [Switch to English](Supported-Platforms-EN)
 
 # 🕹️ Desteklenen Platformlar ve Başlatma Mekanikleri
 

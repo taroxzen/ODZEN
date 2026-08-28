@@ -1,4 +1,4 @@
-﻿> 🇹🇷 **Türkçe** | 🇬🇧 [[Hardware-Monitor-&-Performance-EN|Switch to English]]
+﻿> 🇹🇷 **Türkçe** | 🇬🇧 [Switch to English](Hardware-Monitor-&-Performance-EN)
 
 # 📊 Donanım İzleme ve Performans
 

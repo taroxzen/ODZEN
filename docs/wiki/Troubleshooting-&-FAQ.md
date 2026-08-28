@@ -1,4 +1,4 @@
-﻿> 🇹🇷 **Türkçe** | 🇬🇧 [[Troubleshooting-&-FAQ-EN|Switch to English]]
+﻿> 🇹🇷 **Türkçe** | 🇬🇧 [Switch to English](Troubleshooting-&-FAQ-EN)
 
 # ❓ Sorun Giderme ve Sıkça Sorulan Sorular (SSS)
 

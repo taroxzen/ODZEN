@@ -1,4 +1,4 @@
-﻿> 🇹🇷 **Türkçe** | 🇬🇧 [[Artwork-&-Customization-EN|Switch to English]]
+﻿> 🇹🇷 **Türkçe** | 🇬🇧 [Switch to English](Artwork-&-Customization-EN)
 
 # 🎨 Görsel ve Logo Motoru
 

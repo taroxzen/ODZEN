@@ -1,4 +1,4 @@
-﻿> 🇹🇷 **Türkçe** | 🇬🇧 [[Security-&-Privacy-EN|Switch to English]]
+﻿> 🇹🇷 **Türkçe** | 🇬🇧 [Switch to English](Security-&-Privacy-EN)
 
 # 🛡️ Güvenlik ve Gizlilik
 

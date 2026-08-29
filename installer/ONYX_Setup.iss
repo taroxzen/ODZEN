@@ -1,14 +1,14 @@
-﻿; ============================================================================
+; ============================================================================
 ; ONYX Launcher — Inno Setup Script
 ; Developed by Taroxzen (https://github.com/taroxzen)
 ; Copyright (c) 2026 Taroxzen. All rights reserved.
 ; ============================================================================
 
 #define MyAppName "ONYX Launcher"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.2.0"
 #define MyAppPublisher "Taroxzen"
 #define MyAppURL "https://github.com/taroxzen"
-#define MyAppExeName "ONYX.exe"
+#define MyAppExeName "Onyx.Avalonia.exe"
 
 [Setup]
 ; Temel Uygulama ve Geliştirici Bilgileri
@@ -34,13 +34,13 @@ WizardSmallImageFile=wizard_small.bmp
 LicenseFile=..\LICENSE
 
 ; Çıktı Dosyası Yapılandırması
-OutputDir=..\
-OutputBaseFilename=ONYX_Setup_v1.0
+OutputDir=..\..\
+OutputBaseFilename=ONYX_Setup_v1.2.0
 Compression=lzma2/ultra64
 SolidCompression=yes
 ArchitecturesInstallIn64BitMode=x64
 UninstallDisplayIcon={app}\{#MyAppExeName}
-VersionInfoVersion=1.0.0.0
+VersionInfoVersion=1.2.0.0
 VersionInfoCompany=Taroxzen
 VersionInfoDescription=ONYX Launcher Installer
 VersionInfoCopyright=Copyright (C) 2026 Taroxzen
@@ -70,7 +70,7 @@ french.LaunchOnFinish=Lancer ONYX Launcher maintenant
 russian.LaunchOnFinish=Запустить ONYX Launcher сейчас
 
 [Files]
-Source: "..\ONYX_LAUNCHER_FINAL\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\ONYX-Release-v1.2.0\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"

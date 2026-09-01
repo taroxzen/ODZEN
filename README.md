@@ -1,7 +1,7 @@
-﻿# 🌌 ODZEN — Cybernetic Gaming Platform (v1.3.0)
+# 🌌 ODZEN — Cybernetic Gaming Platform (v1.3.0)
 
 <p align="center">
-  <img src="assets/onyx_logo.svg" alt="ODZEN Logo" width="128" height="128" />
+  <img src="assets/odzen_logo.svg" alt="ODZEN Logo" width="128" height="128" />
 </p>
 
 <p align="center">

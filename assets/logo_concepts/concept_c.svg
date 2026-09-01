@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Neon Glow Filtreleri -->
+    <filter id="neonGlowOuter" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="18" result="blur1" />
+      <feComposite in="SourceGraphic" in2="blur1" operator="over" />
+    </filter>
+    <filter id="neonGlowInner" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur2" />
+      <feComposite in="SourceGraphic" in2="blur2" operator="over" />
+    </filter>
+    <filter id="neonGlowHalo" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="40" result="halo" />
+    </filter>
+
+    <!-- Neon Lime Gradient -->
+    <linearGradient id="neonLime" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EEFF88" />
+      <stop offset="50%" stop-color="#B4FF00" />
+      <stop offset="100%" stop-color="#66BB00" />
+    </linearGradient>
+
+    <!-- Neon Cyan Accent -->
+    <linearGradient id="neonCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00FFFF" />
+      <stop offset="100%" stop-color="#0088CC" />
+    </linearGradient>
+  </defs>
+
+  <!-- Arka Plan: Derin siyah -->
+  <rect width="512" height="512" rx="112" fill="#050510" stroke="#1A1A3A" stroke-width="2" />
+
+  <!-- Dış Neon Hale (Yeşil) -->
+  <circle cx="256" cy="256" r="180" fill="#B4FF00" opacity="0.08" filter="url(#neonGlowHalo)" />
+
+  <!-- İç Neon Hale (Cyan) -->
+  <circle cx="256" cy="256" r="120" fill="#00F0FF" opacity="0.05" filter="url(#neonGlowHalo)" />
+
+  <!-- O Halkası: Neon kenarlıklı -->
+  <g filter="url(#neonGlowOuter)">
+    <path d="M 256,72 A 184,184 0 1,0 440,256 A 184,184 0 0,0 256,72 Z M 256,160 A 96,96 0 1,1 160,256 A 96,96 0 0,1 256,160 Z" fill="url(#neonLime)" />
+  </g>
+
+  <!-- O Halkası İç Kenar Neon Çizgi -->
+  <circle cx="256" cy="256" r="96" fill="none" stroke="#00F0FF" stroke-width="2" opacity="0.6" />
+  <circle cx="256" cy="256" r="184" fill="none" stroke="#00F0FF" stroke-width="1.5" opacity="0.3" />
+
+  <!-- Pixel D-Pad: Neon Cyan vurgulu -->
+  <g transform="translate(325, 95)" filter="url(#neonGlowInner)">
+    <path d="M 32,0 H 64 V 32 H 96 V 64 H 64 V 96 H 32 V 64 H 0 V 32 H 32 Z" fill="#050510" />
+    <path d="M 35,3 H 61 V 35 H 93 V 61 H 61 V 93 H 35 V 61 H 3 V 35 H 35 Z" fill="#B4FF00" />
+    <!-- Yön noktaları: Cyan -->
+    <rect x="42" y="8" width="12" height="12" fill="#00F0FF" />
+    <rect x="42" y="76" width="12" height="12" fill="#00F0FF" />
+    <rect x="8" y="42" width="12" height="12" fill="#00F0FF" />
+    <rect x="76" y="42" width="12" height="12" fill="#00F0FF" />
+    <!-- Merkez: Parlak beyaz -->
+    <rect x="42" y="42" width="12" height="12" fill="#FFFFFF" />
+  </g>
+
+  <!-- Accent Nokta: Çift katmanlı neon -->
+  <circle cx="415" cy="415" r="30" fill="url(#neonLime)" filter="url(#neonGlowOuter)" />
+  <circle cx="415" cy="415" r="16" fill="#00F0FF" opacity="0.4" />
+
+  <!-- Köşe Neon Aksan Çizgileri -->
+  <line x1="60" y1="480" x2="120" y2="480" stroke="#B4FF00" stroke-width="2" opacity="0.3" />
+  <line x1="480" y1="60" x2="480" y2="120" stroke="#00F0FF" stroke-width="2" opacity="0.3" />
+</svg>

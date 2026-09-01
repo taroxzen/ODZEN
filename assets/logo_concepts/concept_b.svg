@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Konsept B: Ultra Minimal — Düz, gölgesiz, saf geometri -->
+
+  <!-- Arka Plan: Saf siyah squircle -->
+  <rect width="512" height="512" rx="112" fill="#0A0A0A" />
+
+  <!-- O Halkası: Tek renk, gradient yok -->
+  <path d="M 256,76 A 180,180 0 1,0 436,256 A 180,180 0 0,0 256,76 Z M 256,168 A 88,88 0 1,1 168,256 A 88,88 0 0,1 256,168 Z" fill="#B4FF00" />
+
+  <!-- Minimal D-Pad: Daha küçük (72x72), sade -->
+  <g transform="translate(340, 105)">
+    <path d="M 24,0 H 48 V 24 H 72 V 48 H 48 V 72 H 24 V 48 H 0 V 24 H 24 Z" fill="#0A0A0A" />
+    <path d="M 26,2 H 46 V 26 H 70 V 46 H 46 V 70 H 26 V 46 H 2 V 26 H 26 Z" fill="#B4FF00" />
+    <!-- Yön noktaları -->
+    <rect x="32" y="7" width="8" height="8" fill="#0A0A0A" />
+    <rect x="32" y="57" width="8" height="8" fill="#0A0A0A" />
+    <rect x="7" y="32" width="8" height="8" fill="#0A0A0A" />
+    <rect x="57" y="32" width="8" height="8" fill="#0A0A0A" />
+    <rect x="32" y="32" width="8" height="8" fill="#8BC34A" />
+  </g>
+</svg>

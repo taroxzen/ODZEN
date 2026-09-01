@@ -1,0 +1,23 @@
+﻿# Rust build artifacts
+target/
+**/*.rs.bk
+Cargo.lock
+
+# .NET / C# build artifacts
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.pdb
+
+# Operating System & IDE Files
+.vs/
+.vscode/
+.idea/
+*.DS_Store
+Thumbs.db
+crash.log
+save_error.log
+*.tmp

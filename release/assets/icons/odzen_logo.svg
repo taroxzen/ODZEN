@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- ONYX Logo — Sınırlara Kadar Uzatılmış Tam Boyutlu Minimal Tasarım -->
+
+  <!-- Arka Plan: Koyu Gece Mavisi (#00162b) -->
+  <rect width="512" height="512" rx="96" fill="#00162b" />
+
+  <!-- O Halkası: Sınırlara kadar uzatılmış devasa dış çap (r=236) -->
+  <path d="M 256,20 A 236,236 0 1,0 492,256 A 236,236 0 0,0 256,20 Z M 256,132 A 124,124 0 1,1 132,256 A 124,124 0 0,1 256,132 Z" fill="#B4FF00" />
+
+  <!-- Pixel D-Pad: Halkanın sağ üst sınırına kadar taşınmış (400, 40) -->
+  <g transform="translate(370, 46)">
+    <!-- Dış çerçeve -->
+    <path d="M 32,0 H 68 V 32 H 100 V 68 H 68 V 100 H 32 V 68 H 0 V 32 H 32 Z" fill="#00162b" />
+    <!-- İç gövde -->
+    <path d="M 35,3 H 65 V 35 H 97 V 65 H 65 V 97 H 35 V 65 H 3 V 35 H 35 Z" fill="#B4FF00" />
+    <!-- Yön noktaları -->
+    <rect x="44" y="9" width="12" height="12" fill="#00162b" />
+    <rect x="44" y="79" width="12" height="12" fill="#00162b" />
+    <rect x="9" y="44" width="12" height="12" fill="#00162b" />
+    <rect x="79" y="44" width="12" height="12" fill="#00162b" />
+    <!-- Merkez pivot -->
+    <rect x="44" y="44" width="12" height="12" fill="#8BC34A" />
+  </g>
+
+  <!-- Accent Nokta: Sağ alt sınırda tam oturmuş -->
+  <circle cx="452" cy="452" r="36" fill="#B4FF00" />
+</svg>

@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bgA" cx="50%" cy="50%" r="75%">
+      <stop offset="0%" stop-color="#002b4d" />
+      <stop offset="70%" stop-color="#00162b" />
+      <stop offset="100%" stop-color="#000d1a" />
+    </radialGradient>
+    <linearGradient id="limeA" x1="15%" y1="15%" x2="85%" y2="85%">
+      <stop offset="0%" stop-color="#e6ff80" />
+      <stop offset="35%" stop-color="#b4ff00" />
+      <stop offset="75%" stop-color="#80d400" />
+      <stop offset="100%" stop-color="#4e8000" />
+    </linearGradient>
+    <filter id="glowA" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="28" result="blur" />
+    </filter>
+    <filter id="shadowA" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#000000" flood-opacity="0.45" />
+    </filter>
+  </defs>
+
+  <!-- Arka Plan -->
+  <rect width="512" height="512" rx="112" fill="url(#bgA)" stroke="#003357" stroke-width="2" />
+
+  <!-- Yeşil Hale -->
+  <circle cx="256" cy="256" r="155" fill="#b4ff00" opacity="0.12" filter="url(#glowA)" />
+
+  <!-- O Halkası -->
+  <g filter="url(#shadowA)">
+    <path d="M 256,70 A 186,186 0 1,0 442,256 A 186,186 0 0,0 256,70 Z M 256,158 A 98,98 0 1,1 158,256 A 98,98 0 0,1 256,158 Z" fill="url(#limeA)" />
+  </g>
+
+  <!-- Pixel D-Pad -->
+  <g transform="translate(328, 98)">
+    <path d="M 30,0 H 62 V 30 H 92 V 62 H 62 V 92 H 30 V 62 H 0 V 30 H 30 Z" fill="#000d1a" />
+    <path d="M 33,3 H 59 V 33 H 89 V 59 H 59 V 89 H 33 V 59 H 3 V 33 H 33 Z" fill="#b4ff00" />
+    <rect x="40" y="8" width="12" height="12" fill="#00233f" />
+    <rect x="40" y="72" width="12" height="12" fill="#00233f" />
+    <rect x="8" y="40" width="12" height="12" fill="#00233f" />
+    <rect x="72" y="40" width="12" height="12" fill="#00233f" />
+    <rect x="40" y="40" width="12" height="12" fill="#abe466" />
+  </g>
+
+  <!-- Accent Nokta -->
+  <circle cx="412" cy="412" r="30" fill="url(#limeA)" filter="url(#shadowA)" />
+</svg>

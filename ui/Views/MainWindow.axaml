@@ -1,0 +1,1248 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:Odzen.Avalonia.ViewModels"
+        xmlns:models="clr-namespace:Odzen.Avalonia.Models"
+        xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
+        x:Class="Odzen.Avalonia.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Title="ODZEN"
+        Icon="/Assets/odzen_logo.ico"
+        Width="1420" Height="900"
+        MinWidth="1100" MinHeight="700"
+        WindowStartupLocation="CenterScreen"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaTitleBarHeightHint="-1"
+        Background="Transparent">
+
+    <Border Background="#070A12" 
+            BorderBrush="#1A2333" 
+            BorderThickness="1" 
+            CornerRadius="14"
+            ClipToBounds="True">
+        
+        <LayoutTransformControl>
+            <LayoutTransformControl.LayoutTransform>
+                <ScaleTransform ScaleX="{Binding UiScale}" ScaleY="{Binding UiScale}" />
+            </LayoutTransformControl.LayoutTransform>
+            
+            <Grid RowDefinitions="68, *">
+
+                <!-- 1. UNIFIED HEADER BAR -->
+            <Border Grid.Row="0" Background="#0C1322" BorderBrush="#1AFFFFFF" BorderThickness="0,0,0,1" PointerPressed="OnTitleBarPointerPressed">
+                <Grid ColumnDefinitions="Auto, *, Auto, Auto, Auto" Margin="20,0">
+
+                    <!-- BRAND LOGO AND TITLE (ONYX_LOGO.SVG) -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Spacing="12" Margin="0,0,24,0">
+                        <Image Source="{svg:SvgImage avares://ODZEN/Assets/odzen_logo.svg}" Width="42" Height="42" VerticalAlignment="Center" />
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="ODZEN" FontSize="20" FontWeight="ExtraBold" Foreground="#FFFFFF" LetterSpacing="1" />
+                            <TextBlock Text="GAMING CORE" FontSize="10" FontWeight="Bold" Foreground="#B4FF00" LetterSpacing="3" Margin="0,-2,0,0" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- SEARCH BAR -->
+                    <Border Grid.Column="1" HorizontalAlignment="Left" Width="380" Height="40" Background="#14FFFFFF" BorderBrush="#20FFFFFF" BorderThickness="1" CornerRadius="20" VerticalAlignment="Center">
+                        <Grid ColumnDefinitions="Auto, *" Margin="14,0">
+                            <PathIcon Grid.Column="0" Data="{StaticResource IconSearch}" Width="14" Height="14" Foreground="#64748B" VerticalAlignment="Center" Margin="0,0,8,0" />
+                            <TextBox Grid.Column="1" 
+                                     Text="{Binding SearchText, Mode=TwoWay}" 
+                                     Watermark="{Binding TxtSearchWatermark}" 
+                                     Background="Transparent" 
+                                     BorderThickness="0" 
+                                     Foreground="#F8FAFC" 
+                                     FontSize="13" 
+                                     VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
+
+                    <!-- MUSIC SERVICES WITH OFFICIAL SVG LOGOS -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Spacing="8" Margin="0,0,16,0" IsVisible="{Binding ShowMusicButton}">
+                        <Button Classes="glass-btn" Command="{Binding LaunchSpotifyCommand}" ToolTip.Tip="Spotify" Padding="0" CornerRadius="20" Width="38" Height="38">
+                            <Image Source="{svg:SvgImage avares://ODZEN/Assets/spotify.svg}" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Button>
+                        <Button Classes="glass-btn" Command="{Binding LaunchYouTubeMusicCommand}" ToolTip.Tip="YouTube Music" Padding="0" CornerRadius="20" Width="38" Height="38">
+                            <Image Source="{svg:SvgImage avares://ODZEN/Assets/youtube_music.svg}" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Button>
+                        <Button Classes="glass-btn" Command="{Binding LaunchAppleMusicCommand}" ToolTip.Tip="Apple Music" Padding="0" CornerRadius="20" Width="38" Height="38">
+                            <Image Source="{svg:SvgImage avares://ODZEN/Assets/apple_music.svg}" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Button>
+                        <Button Classes="glass-btn" Command="{Binding LaunchTidalCommand}" ToolTip.Tip="TIDAL" Padding="0" CornerRadius="20" Width="38" Height="38">
+                            <Image Source="{svg:SvgImage avares://ODZEN/Assets/tidal.svg}" Width="18" Height="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Button>
+                        <Button Classes="glass-btn" Command="{Binding LaunchDeezerCommand}" ToolTip.Tip="Deezer" Padding="0" CornerRadius="20" Width="38" Height="38">
+                            <Image Source="{svg:SvgImage avares://ODZEN/Assets/deezer.svg}" Width="18" Height="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Button>
+                    </StackPanel>
+
+                    <!-- DISCORD WITH OFFICIAL SVG LOGO -->
+                    <Border Grid.Column="3" VerticalAlignment="Center" Margin="0,0,24,0" IsVisible="{Binding ShowDiscordButton}">
+                        <Button Classes="discord-btn" Command="{Binding LaunchDiscordCommand}" Background="#5865F2" CornerRadius="18" Padding="14,8" Cursor="Hand">
+                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <Image Source="{svg:SvgImage avares://ODZEN/Assets/discord.svg}" Width="18" Height="18" VerticalAlignment="Center" />
+                                <TextBlock Text="Discord" FontWeight="Bold" Foreground="White" FontSize="12" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                    </Border>
+
+                    <!-- CENTERED WINDOW CONTROLS -->
+                    <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center" Spacing="6">
+                        <Button Classes="glass-btn" Click="OnMinimizeClick" Width="36" Height="32" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                            <TextBlock Text="—" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Button>
+                        <Button Classes="glass-btn" Click="OnMaximizeClick" Width="36" Height="32" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                            <TextBlock Text="▢" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Button>
+                        <Button Classes="glass-btn" Click="OnCloseClick" Width="36" Height="32" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                            <TextBlock Text="✕" FontSize="12" Foreground="#FF5555" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- 2. MAIN BODY (SIDEBAR + CONTENT + TOAST) -->
+            <Grid Grid.Row="1" ColumnDefinitions="270, *">
+
+                <!-- LEFT SIDEBAR WITH ALPHABETICAL PLATFORM SVG LOGOS -->
+                <Border Grid.Column="0" Background="#0A0F1D" BorderBrush="#1AFFFFFF" BorderThickness="0,0,1,0" Padding="16">
+                    <Grid RowDefinitions="Auto, *, Auto, Auto">
+
+                        <!-- Title -->
+                        <TextBlock Grid.Row="0" Text="PLATFORMS" FontSize="11" FontWeight="Bold" Foreground="#64748B" LetterSpacing="1" Margin="8,0,0,12" />
+
+                        <!-- Platform List in A-Z Alphabetical Order -->
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <StackPanel Spacing="4">
+                                <!-- Top Static Pins: All Games, Platform Launchers & Favorites -->
+                                <Button Classes="menu-item" Command="{Binding SelectPlatformCommand}" CommandParameter="all">
+                                    <Grid ColumnDefinitions="Auto, *, Auto" Width="210">
+                                        <PathIcon Grid.Column="0" Data="{StaticResource IconGamepad}" Width="16" Height="16" Margin="0,0,10,0" Foreground="#00F0FF" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="1" Text="{Binding TxtAllGames}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                        <Border Grid.Column="2" Background="#20B4FF00" CornerRadius="10" Padding="8,2">
+                                            <TextBlock Text="{Binding AllGamesCount}" FontSize="11" Foreground="#B4FF00" FontWeight="Bold" />
+                                        </Border>
+                                    </Grid>
+                                </Button>
+
+                                <!-- RESMİ OYUN PLATFORMLARI & BAŞLATICILARI (LAUNCHERS) -->
+                                <Button Classes="menu-item" Command="{Binding OpenPlatformsViewCommand}">
+                                    <Grid ColumnDefinitions="Auto, *, Auto" Width="210">
+                                        <PathIcon Grid.Column="0" Data="{StaticResource IconGlobe}" Width="16" Height="16" Margin="0,0,10,0" Foreground="#B4FF00" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="1" Text="{Binding TxtPlatformLaunchers}" FontWeight="Bold" Foreground="#B4FF00" VerticalAlignment="Center" />
+                                        <Border Grid.Column="2" Background="#20B4FF00" CornerRadius="10" Padding="8,2">
+                                            <TextBlock Text="10" FontSize="11" Foreground="#B4FF00" FontWeight="Bold" />
+                                        </Border>
+                                    </Grid>
+                                </Button>
+
+                                <Button Classes="menu-item" Command="{Binding SelectPlatformCommand}" CommandParameter="favorites">
+                                    <Grid ColumnDefinitions="Auto, *, Auto" Width="210">
+                                        <PathIcon Grid.Column="0" Data="{StaticResource IconStar}" Width="16" Height="16" Margin="0,0,10,0" Foreground="#FBBF24" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="1" Text="{Binding TxtFavorites}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                        <Border Grid.Column="2" Background="#20FBBF24" CornerRadius="10" Padding="8,2">
+                                            <TextBlock Text="{Binding FavGamesCount}" FontSize="11" Foreground="#FBBF24" FontWeight="Bold" />
+                                        </Border>
+                                    </Grid>
+                                </Button>
+                                <Separator Background="#1AFFFFFF" Margin="6,4" />
+
+                                <!-- ALPHABETICAL ORDER A-Z -->
+                                <!-- 1. Amazon Games -->
+                                <Button Classes="menu-item" Command="{Binding SelectPlatformCommand}" CommandParameter="amazon">
+                                    <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                        <Image Source="{svg:SvgImage avares://ODZEN/Assets/amazon.svg}" Width="18" Height="18" />
+                                        <TextBlock Text="Amazon Games" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+
+                                <!-- 2. Battle.net -->
+                                <Button Classes="menu-item" Command="{Binding SelectPlatformCommand}" CommandParameter="battlenet">
+                                    <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                        <Image Source="{svg:SvgImage avares://ODZEN/Assets/battlenet.svg}" Width="18" Height="18" />
+                                        <TextBlock Text="Battle.net" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+
+                                <!-- 3. EA App -->
+                                <Button Classes="menu-item" Command="{Binding SelectPlatformCommand}" CommandParameter="ea">
+                                    <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                        <Image Source="{svg:SvgImage avares://ODZEN/Assets/ea.svg}" Width="18" Height="18" />
+                                        <TextBlock Text="EA App" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+
+                                <!-- 4. Epic Games -->
+                                <Button Classes="menu-item" Command="{Binding SelectPlatformCommand}" CommandParameter="epic">
+                                    <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                        <Image Source="{svg:SvgImage avares://ODZEN/Assets/epic.svg}" Width="18" Height="18" />
+                                        <TextBlock Text="Epic Games" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+
+                                <!-- 5. GOG Galaxy -->
+                                <Button Classes="menu-item" Command="{Binding SelectPlatformCommand}" CommandParameter="gog">
+                                    <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                        <Image Source="{svg:SvgImage avares://ODZEN/Assets/gog.svg}" Width="18" Height="18" />
+                                        <TextBlock Text="GOG Galaxy" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+
+                                <!-- 6. Metin2 Sunucuları -->
+                                <Button Classes="menu-item" Command="{Binding SelectPlatformCommand}" CommandParameter="metin2">
+                                    <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                        <Image Source="{svg:SvgImage avares://ODZEN/Assets/metin2.svg}" Width="18" Height="18" />
+                                        <TextBlock Text="Metin2 Sunucuları" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+
+                                <!-- 7. Minecraft -->
+                                <Button Classes="menu-item" Command="{Binding SelectPlatformCommand}" CommandParameter="minecraft">
+                                    <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                        <Image Source="{svg:SvgImage avares://ODZEN/Assets/minecraft.svg}" Width="18" Height="18" />
+                                        <TextBlock Text="Minecraft" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+
+                                <!-- 8. Riot Games -->
+                                <Button Classes="menu-item" Command="{Binding SelectPlatformCommand}" CommandParameter="riot">
+                                    <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                        <Image Source="{svg:SvgImage avares://ODZEN/Assets/riot.svg}" Width="18" Height="18" />
+                                        <TextBlock Text="Riot Games" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+
+                                <!-- 9. Rockstar Games -->
+                                <Button Classes="menu-item" Command="{Binding SelectPlatformCommand}" CommandParameter="rockstar">
+                                    <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                        <Image Source="{svg:SvgImage avares://ODZEN/Assets/rockstar.svg}" Width="18" Height="18" />
+                                        <TextBlock Text="Rockstar Games" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+
+                                <!-- 10. Steam -->
+                                <Button Classes="menu-item" Command="{Binding SelectPlatformCommand}" CommandParameter="steam">
+                                    <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                        <Image Source="{svg:SvgImage avares://ODZEN/Assets/steam.svg}" Width="18" Height="18" />
+                                        <TextBlock Text="Steam" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+
+                                <!-- 11. Ubisoft Connect -->
+                                <Button Classes="menu-item" Command="{Binding SelectPlatformCommand}" CommandParameter="ubisoft">
+                                    <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                        <Image Source="{svg:SvgImage avares://ODZEN/Assets/ubisoft.svg}" Width="18" Height="18" />
+                                        <TextBlock Text="Ubisoft Connect" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+
+                                <!-- 12. Xbox -->
+                                <Button Classes="menu-item" Command="{Binding SelectPlatformCommand}" CommandParameter="xbox">
+                                    <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                        <Image Source="{svg:SvgImage avares://ODZEN/Assets/xbox.svg}" Width="18" Height="18" />
+                                        <TextBlock Text="Xbox" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+
+                                <!-- 13. Yerel Oyunlar -->
+                                <Button Classes="menu-item" Command="{Binding SelectPlatformCommand}" CommandParameter="local">
+                                    <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                        <Image Source="{svg:SvgImage avares://ODZEN/Assets/local.svg}" Width="18" Height="18" />
+                                        <TextBlock Text="{Binding TxtLocalGames}" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </ScrollViewer>
+
+                        <!-- Actions: TARA & MANUEL EKLE BUTONLARI (ENLARGED & PHOSPHOR GREEN) -->
+                        <Grid Grid.Row="2" ColumnDefinitions="*, 8, *" Margin="0,14,0,8">
+                            <Button Grid.Column="0" Classes="neon-primary" Command="{Binding ScanGamesCommand}" Height="42" Padding="0" HorizontalAlignment="Stretch">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6">
+                                    <PathIcon Data="{StaticResource IconBolt}" Width="14" Height="14" Foreground="#00162B" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding TxtScan}" FontSize="13" FontWeight="ExtraBold" Foreground="#00162B" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                            <Button Grid.Column="2" Classes="neon-primary" Command="{Binding AddCustomGameCommand}" Height="42" Padding="0" HorizontalAlignment="Stretch">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6">
+                                    <PathIcon Data="{StaticResource IconPlus}" Width="14" Height="14" Foreground="#00162B" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding TxtAdd}" FontSize="13" FontWeight="ExtraBold" Foreground="#00162B" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+
+                        <!-- Settings Button -->
+                        <Button Grid.Row="3" Classes="menu-item" Command="{Binding OpenSettingsCommand}">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <PathIcon Data="{StaticResource IconGear}" Width="15" Height="15" Foreground="#00F0FF" />
+                                <TextBlock Text="{Binding TxtSettings}" FontWeight="Bold" />
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+                </Border>
+
+                <!-- RIGHT MAIN PANEL -->
+                <Grid Grid.Column="1" Background="#0F172A">
+                    
+                    <!-- 1. GAMES VIEW -->
+                    <Grid RowDefinitions="Auto, Auto, *" IsVisible="{Binding ShowMainGamesView}">
+
+                        <!-- Category Title Bar -->
+                        <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Margin="28,18,28,8">
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{Binding CurrentSectionTitle}" FontSize="24" FontWeight="ExtraBold" Foreground="#F8FAFC" />
+                                <TextBlock Text="{Binding CurrentSectionSubtitle}" FontSize="12" Foreground="#64748B" Margin="0,2,0,0" />
+                            </StackPanel>
+
+                            <!-- Scanning indicator -->
+                            <Border Grid.Column="1" Background="#20B4FF00" BorderBrush="#60B4FF00" BorderThickness="1" CornerRadius="12" Padding="14,6" IsVisible="{Binding IsScanning}">
+                                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                    <PathIcon Data="{StaticResource IconBolt}" Width="13" Height="13" Foreground="#B4FF00" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding TxtScanning}" Foreground="#B4FF00" FontWeight="Bold" FontSize="12" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+
+                        <!-- SİNEMATİK OYUN VİTRİNİ (AÇMA / KAPAMA DESTEKLİ) -->
+                        <Border Grid.Row="1" Margin="28,4,28,14" Background="#131B2E" BorderBrush="#35B4FF00" BorderThickness="1" CornerRadius="16" Padding="22" Height="175" ClipToBounds="True" IsVisible="{Binding ShowShowcase}">
+                            <Grid ColumnDefinitions="Auto, *, Auto">
+                                
+                                <!-- Vitrin Oyunu Büyük Logosu / İkonu -->
+                                <Border Grid.Column="0" Width="115" Height="115" Background="#0C1322" CornerRadius="14" BorderBrush="#45B4FF00" BorderThickness="1">
+                                    <Panel>
+                                        <Image Source="{Binding SelectedGame.GameIcon}" Width="72" Height="72" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding SelectedGame.HasGameIcon, FallbackValue=False}" />
+                                        <Image Source="{Binding SelectedGame.PlatformLogoPath}" Width="58" Height="58" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding !SelectedGame.HasGameIcon, FallbackValue=True}" />
+                                    </Panel>
+                                </Border>
+
+                                <!-- Vitrin Oyunu Detayları -->
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="24,0,0,0" Spacing="8">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <Border Background="#90000000" CornerRadius="6" Padding="8,3">
+                                            <TextBlock Text="{Binding SelectedGame.PlatformName, FallbackValue='Steam'}" FontSize="11" FontWeight="Bold" Foreground="#00F0FF" />
+                                        </Border>
+                                        <Border Background="#20B4FF00" CornerRadius="6" Padding="8,3">
+                                            <TextBlock Text="{Binding TxtLastOpened}" FontSize="10" FontWeight="Bold" Foreground="#B4FF00" />
+                                        </Border>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding SelectedGame.Name, FallbackValue='...'}" FontSize="24" FontWeight="ExtraBold" Foreground="#FFFFFF" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Text="{Binding SelectedGame.FormattedSize, FallbackValue=''}" FontSize="13" Foreground="#94A3B8" />
+                                </StackPanel>
+
+                                <!-- SAĞ KISIM: HEMEN OYNA BUTONU + SAĞ ALTTA SON OYNANAN 5 OYUN -->
+                                <Grid Grid.Column="2" RowDefinitions="Auto, Auto" VerticalAlignment="Center">
+                                    
+                                    <!-- Büyük Oyna Butonu -->
+                                    <Button Grid.Row="0" Classes="primary-play-btn" Command="{Binding LaunchGameCommand}" CommandParameter="{Binding SelectedGame}" Width="190" Height="46" CornerRadius="12">
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+                                            <PathIcon Data="{StaticResource IconPlay}" Width="14" Height="14" Foreground="#00162B" VerticalAlignment="Center" />
+                                            <TextBlock Text="{Binding TxtPlayNow}" FontSize="13" FontWeight="ExtraBold" Foreground="#00162B" LetterSpacing="1" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </Button>
+
+                                    <!-- SAĞ ALTTA SON OYNANAN 5 OYUN LİSTESİ (BÜYÜTÜLMÜŞ) -->
+                                    <StackPanel Grid.Row="1" Margin="0,10,0,0" HorizontalAlignment="Right">
+                                        <TextBlock Text="{Binding TxtRecentGames}" FontSize="10" FontWeight="Bold" Foreground="#64748B" LetterSpacing="1" Margin="0,0,0,6" HorizontalAlignment="Right" />
+                                        <ItemsControl ItemsSource="{Binding RecentGames}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel Orientation="Horizontal" Spacing="8" />
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate DataType="{x:Type models:GameItem}">
+                                                    <Button Classes="glass-btn" 
+                                                            Command="{Binding $parent[Window].((vm:MainViewModel)DataContext).SelectGameCommand}" 
+                                                            CommandParameter="{Binding}"
+                                                            ToolTip.Tip="{Binding Name}"
+                                                            Width="44" Height="44" Padding="0" CornerRadius="10">
+                                                        <Panel>
+                                                            <Image Source="{Binding GameIcon}" Width="28" Height="28" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding HasGameIcon}" />
+                                                            <Image Source="{Binding PlatformLogoPath}" Width="24" Height="24" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding !HasGameIcon}" />
+                                                        </Panel>
+                                                    </Button>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <!-- OYUN KARTLARI (TAM EKRANDA ESNEK BÜYÜYEN VE ANİMASYONLU KART DÜZENİ) -->
+                        <ScrollViewer Grid.Row="2" Margin="24,0,24,16" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding FilteredGames}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Orientation="Horizontal" ItemWidth="260" ItemHeight="300" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type models:GameItem}">
+                                        <Border Classes="game-card" Margin="10">
+                                            <Grid RowDefinitions="*, Auto">
+                                                
+                                                <!-- Top Game Cover / Artwork Area -->
+                                                <Border Grid.Row="0" CornerRadius="14,14,0,0" ClipToBounds="True" Background="#0C1322">
+                                                    <Panel>
+                                                        <!-- Game Icon / Cover -->
+                                                        <Image Source="{Binding GameIcon}" Stretch="Uniform" Margin="16" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding HasGameIcon}" />
+                                                        <Image Source="{Binding PlatformLogoPath}" Stretch="Uniform" Width="64" Height="64" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding !HasGameIcon}" />
+
+                                                        <!-- Platform Badge Overlay -->
+                                                        <Border HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8" Background="#A0000000" CornerRadius="6" Padding="6,2">
+                                                            <TextBlock Text="{Binding PlatformName}" FontSize="9" FontWeight="Bold" Foreground="#00F0FF" />
+                                                        </Border>
+
+                                                        <!-- Favorite Star (Top Right) -->
+                                                        <Button Classes="glass-btn" Command="{Binding $parent[Window].((vm:MainViewModel)DataContext).ToggleFavoriteCommand}" CommandParameter="{Binding}" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="8" Width="28" Height="28" Padding="0">
+                                                            <PathIcon Data="{StaticResource IconStar}" Width="12" Height="12" Foreground="{Binding FavoriteColor}" />
+                                                        </Button>
+                                                    </Panel>
+                                                </Border>
+
+                                                <!-- Bottom Game Info & Actions -->
+                                                <Grid Grid.Row="1" RowDefinitions="Auto, Auto, Auto" Margin="12,8,12,12">
+                                                    <TextBlock Grid.Row="0" Text="{Binding Name}" FontWeight="Bold" FontSize="13" Foreground="#FFFFFF" TextTrimming="CharacterEllipsis" Margin="0,0,0,2" />
+                                                    <TextBlock Grid.Row="1" Text="{Binding FormattedSize}" FontSize="11" Foreground="#64748B" Margin="0,0,0,8" />
+
+                                                    <!-- Card Buttons: Oyna + Ufak Çark (Hızlı Aksiyon & Yapılandırma) Butonu -->
+                                                    <Grid Grid.Row="2" ColumnDefinitions="*, 8, Auto">
+                                                        <Button Grid.Column="0" Classes="neon-primary" 
+                                                                Command="{Binding $parent[Window].((vm:MainViewModel)DataContext).LaunchGameCommand}" 
+                                                                CommandParameter="{Binding}"
+                                                                Padding="10,6" Height="36">
+                                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="6">
+                                                                <PathIcon Data="{StaticResource IconPlay}" Width="12" Height="12" Foreground="#00162B" VerticalAlignment="Center" />
+                                                                <TextBlock Text="{Binding $parent[Window].((vm:MainViewModel)DataContext).TxtPlay}" FontSize="13" FontWeight="Bold" VerticalAlignment="Center" />
+                                                            </StackPanel>
+                                                        </Button>
+                                                        <Button Grid.Column="2" Classes="ps5-gear-btn"
+                                                                Command="{Binding $parent[Window].((vm:MainViewModel)DataContext).OpenGameDetailCommand}"
+                                                                CommandParameter="{Binding}"
+                                                                Width="38" Height="36" Padding="0" ToolTip.Tip="Oyun Yapılandırması &amp; Hızlı Aksiyonlar">
+                                                            <PathIcon Data="{StaticResource IconGear}" Width="15" Height="15" Foreground="#00F0FF" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                        </Button>
+                                                    </Grid>
+                                                </Grid>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+
+                    <!-- 2. RESMİ PLATFORM BAŞLATICILARI MERKEZİ (PLATFORMS VIEW) -->
+                    <ScrollViewer IsVisible="{Binding IsPlatformsViewOpen}" Margin="28,20" VerticalScrollBarVisibility="Auto">
+                        <StackPanel Spacing="22">
+                            <!-- Header Bar with Back Button -->
+                            <Grid ColumnDefinitions="*, Auto">
+                                <StackPanel Grid.Column="0" Spacing="4">
+                                    <TextBlock Text="{Binding TxtPlatformLaunchers}" FontSize="26" FontWeight="ExtraBold" Foreground="#F8FAFC" />
+                                    <TextBlock Text="{Binding TxtPlatformLaunchersSubtitle}" FontSize="13" Foreground="#94A3B8" />
+                                </StackPanel>
+                                <Button Grid.Column="1" Classes="glass-btn" Command="{Binding BackToGamesCommand}" Height="44" Padding="20,10" VerticalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                        <TextBlock Text="←" FontWeight="Bold" FontSize="14" Foreground="#00F0FF" VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding TxtBackToLibrary}" FontWeight="Bold" FontSize="13" Foreground="#F8FAFC" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+
+                            <!-- RESPONSIVE PLATFORM LAUNCHER CARDS WRAPPANEL -->
+                            <WrapPanel Orientation="Horizontal">
+                                
+                                <!-- 1. STEAM -->
+                                <Border Width="460" MinWidth="340" Background="#0C1B2E" BorderBrush="#4000F0FF" BorderThickness="1.5" CornerRadius="16" Padding="20,16" Margin="0,0,16,16" BoxShadow="0 6 20 #25000000">
+                                    <Grid ColumnDefinitions="Auto, *, Auto" VerticalAlignment="Center">
+                                        <Border Grid.Column="0" Width="58" Height="58" CornerRadius="14" Background="#14243B" BorderBrush="#25FFFFFF" BorderThickness="1" Margin="0,0,14,0">
+                                            <Image Source="{svg:SvgImage avares://ODZEN/Assets/steam.svg}" Width="36" Height="36" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="3">
+                                            <TextBlock Text="Steam" FontSize="16" FontWeight="ExtraBold" Foreground="#FFFFFF" />
+                                            <TextBlock Text="Valve Steam İstemcisi ve Oyun Mağazası" FontSize="12" Foreground="#94A3B8" />
+                                        </StackPanel>
+                                        <Button Grid.Column="2" Classes="neon-primary" Command="{Binding LaunchPlatformClientCommand}" CommandParameter="steam" Height="42" Padding="22,10">
+                                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                <PathIcon Data="{StaticResource IconPlay}" Width="12" Height="12" Foreground="#00162B" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding TxtLaunch}" FontWeight="ExtraBold" FontSize="13" Foreground="#00162B" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+
+                                <!-- 2. EPIC GAMES -->
+                                <Border Width="460" MinWidth="340" Background="#0C1B2E" BorderBrush="#40FFFFFF" BorderThickness="1.5" CornerRadius="16" Padding="20,16" Margin="0,0,16,16" BoxShadow="0 6 20 #25000000">
+                                    <Grid ColumnDefinitions="Auto, *, Auto" VerticalAlignment="Center">
+                                        <Border Grid.Column="0" Width="58" Height="58" CornerRadius="14" Background="#14243B" BorderBrush="#25FFFFFF" BorderThickness="1" Margin="0,0,14,0">
+                                            <Image Source="{svg:SvgImage avares://ODZEN/Assets/epic.svg}" Width="34" Height="34" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="3">
+                                            <TextBlock Text="Epic Games" FontSize="16" FontWeight="ExtraBold" Foreground="#FFFFFF" />
+                                            <TextBlock Text="Epic Games Launcher ve İstemcisi" FontSize="12" Foreground="#94A3B8" />
+                                        </StackPanel>
+                                        <Button Grid.Column="2" Classes="neon-primary" Command="{Binding LaunchPlatformClientCommand}" CommandParameter="epic" Height="42" Padding="22,10">
+                                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                <PathIcon Data="{StaticResource IconPlay}" Width="12" Height="12" Foreground="#00162B" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding TxtLaunch}" FontWeight="ExtraBold" FontSize="13" Foreground="#00162B" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+
+                                <!-- 3. RIOT GAMES / CLIENT -->
+                                <Border Width="460" MinWidth="340" Background="#0C1B2E" BorderBrush="#40FF4655" BorderThickness="1.5" CornerRadius="16" Padding="20,16" Margin="0,0,16,16" BoxShadow="0 6 20 #25000000">
+                                    <Grid ColumnDefinitions="Auto, *, Auto" VerticalAlignment="Center">
+                                        <Border Grid.Column="0" Width="58" Height="58" CornerRadius="14" Background="#14243B" BorderBrush="#25FFFFFF" BorderThickness="1" Margin="0,0,14,0">
+                                            <Image Source="{svg:SvgImage avares://ODZEN/Assets/riot.svg}" Width="34" Height="34" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="3">
+                                            <TextBlock Text="Riot Client" FontSize="16" FontWeight="ExtraBold" Foreground="#FFFFFF" />
+                                            <TextBlock Text="Riot Games Resmi Başlatıcı İstemcisi" FontSize="12" Foreground="#94A3B8" />
+                                        </StackPanel>
+                                        <Button Grid.Column="2" Classes="neon-primary" Command="{Binding LaunchPlatformClientCommand}" CommandParameter="riot" Height="42" Padding="22,10">
+                                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                <PathIcon Data="{StaticResource IconPlay}" Width="12" Height="12" Foreground="#00162B" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding TxtLaunch}" FontWeight="ExtraBold" FontSize="13" Foreground="#00162B" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+
+                                <!-- 4. MINECRAFT -->
+                                <Border Width="460" MinWidth="340" Background="#0C1B2E" BorderBrush="#4052A447" BorderThickness="1.5" CornerRadius="16" Padding="20,16" Margin="0,0,16,16" BoxShadow="0 6 20 #25000000">
+                                    <Grid ColumnDefinitions="Auto, *, Auto" VerticalAlignment="Center">
+                                        <Border Grid.Column="0" Width="58" Height="58" CornerRadius="14" Background="#14243B" BorderBrush="#25FFFFFF" BorderThickness="1" Margin="0,0,14,0">
+                                            <Image Source="{svg:SvgImage avares://ODZEN/Assets/minecraft.svg}" Width="36" Height="36" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="3">
+                                            <TextBlock Text="Minecraft Launcher" FontSize="16" FontWeight="ExtraBold" Foreground="#FFFFFF" />
+                                            <TextBlock Text="Mojang / Microsoft Minecraft Başlatıcısı" FontSize="12" Foreground="#94A3B8" />
+                                        </StackPanel>
+                                        <Button Grid.Column="2" Classes="neon-primary" Command="{Binding LaunchPlatformClientCommand}" CommandParameter="minecraft" Height="42" Padding="22,10">
+                                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                <PathIcon Data="{StaticResource IconPlay}" Width="12" Height="12" Foreground="#00162B" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding TxtLaunch}" FontWeight="ExtraBold" FontSize="13" Foreground="#00162B" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+
+                                <!-- 5. ROCKSTAR GAMES -->
+                                <Border Width="460" MinWidth="340" Background="#0C1B2E" BorderBrush="#40FBBF24" BorderThickness="1.5" CornerRadius="16" Padding="20,16" Margin="0,0,16,16" BoxShadow="0 6 20 #25000000">
+                                    <Grid ColumnDefinitions="Auto, *, Auto" VerticalAlignment="Center">
+                                        <Border Grid.Column="0" Width="58" Height="58" CornerRadius="14" Background="#14243B" BorderBrush="#25FFFFFF" BorderThickness="1" Margin="0,0,14,0">
+                                            <Image Source="{svg:SvgImage avares://ODZEN/Assets/rockstar.svg}" Width="34" Height="34" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="3">
+                                            <TextBlock Text="Rockstar Games Launcher" FontSize="16" FontWeight="ExtraBold" Foreground="#FFFFFF" />
+                                            <TextBlock Text="Rockstar Games Resmi İstemcisi" FontSize="12" Foreground="#94A3B8" />
+                                        </StackPanel>
+                                        <Button Grid.Column="2" Classes="neon-primary" Command="{Binding LaunchPlatformClientCommand}" CommandParameter="rockstar" Height="42" Padding="22,10">
+                                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                <PathIcon Data="{StaticResource IconPlay}" Width="12" Height="12" Foreground="#00162B" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding TxtLaunch}" FontWeight="ExtraBold" FontSize="13" Foreground="#00162B" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+
+                                <!-- 6. UBISOFT CONNECT -->
+                                <Border Width="460" MinWidth="340" Background="#0C1B2E" BorderBrush="#400080FF" BorderThickness="1.5" CornerRadius="16" Padding="20,16" Margin="0,0,16,16" BoxShadow="0 6 20 #25000000">
+                                    <Grid ColumnDefinitions="Auto, *, Auto" VerticalAlignment="Center">
+                                        <Border Grid.Column="0" Width="58" Height="58" CornerRadius="14" Background="#14243B" BorderBrush="#25FFFFFF" BorderThickness="1" Margin="0,0,14,0">
+                                            <Image Source="{svg:SvgImage avares://ODZEN/Assets/ubisoft.svg}" Width="34" Height="34" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="3">
+                                            <TextBlock Text="Ubisoft Connect" FontSize="16" FontWeight="ExtraBold" Foreground="#FFFFFF" />
+                                            <TextBlock Text="Ubisoft Connect Resmi İstemcisi" FontSize="12" Foreground="#94A3B8" />
+                                        </StackPanel>
+                                        <Button Grid.Column="2" Classes="neon-primary" Command="{Binding LaunchPlatformClientCommand}" CommandParameter="ubisoft" Height="42" Padding="22,10">
+                                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                <PathIcon Data="{StaticResource IconPlay}" Width="12" Height="12" Foreground="#00162B" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding TxtLaunch}" FontWeight="ExtraBold" FontSize="13" Foreground="#00162B" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+
+                                <!-- 7. EA APP -->
+                                <Border Width="460" MinWidth="340" Background="#0C1B2E" BorderBrush="#40FF4747" BorderThickness="1.5" CornerRadius="16" Padding="20,16" Margin="0,0,16,16" BoxShadow="0 6 20 #25000000">
+                                    <Grid ColumnDefinitions="Auto, *, Auto" VerticalAlignment="Center">
+                                        <Border Grid.Column="0" Width="58" Height="58" CornerRadius="14" Background="#14243B" BorderBrush="#25FFFFFF" BorderThickness="1" Margin="0,0,14,0">
+                                            <Image Source="{svg:SvgImage avares://ODZEN/Assets/ea.svg}" Width="34" Height="34" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="3">
+                                            <TextBlock Text="EA App" FontSize="16" FontWeight="ExtraBold" Foreground="#FFFFFF" />
+                                            <TextBlock Text="Electronic Arts EA App İstemcisi" FontSize="12" Foreground="#94A3B8" />
+                                        </StackPanel>
+                                        <Button Grid.Column="2" Classes="neon-primary" Command="{Binding LaunchPlatformClientCommand}" CommandParameter="ea" Height="42" Padding="22,10">
+                                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                <PathIcon Data="{StaticResource IconPlay}" Width="12" Height="12" Foreground="#00162B" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding TxtLaunch}" FontWeight="ExtraBold" FontSize="13" Foreground="#00162B" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+
+                                <!-- 8. BATTLE.NET -->
+                                <Border Width="460" MinWidth="340" Background="#0C1B2E" BorderBrush="#4000AEFF" BorderThickness="1.5" CornerRadius="16" Padding="20,16" Margin="0,0,16,16" BoxShadow="0 6 20 #25000000">
+                                    <Grid ColumnDefinitions="Auto, *, Auto" VerticalAlignment="Center">
+                                        <Border Grid.Column="0" Width="58" Height="58" CornerRadius="14" Background="#14243B" BorderBrush="#25FFFFFF" BorderThickness="1" Margin="0,0,14,0">
+                                            <Image Source="{svg:SvgImage avares://ODZEN/Assets/battlenet.svg}" Width="34" Height="34" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="3">
+                                            <TextBlock Text="Battle.net" FontSize="16" FontWeight="ExtraBold" Foreground="#FFFFFF" />
+                                            <TextBlock Text="Blizzard Battle.net Resmi İstemcisi" FontSize="12" Foreground="#94A3B8" />
+                                        </StackPanel>
+                                        <Button Grid.Column="2" Classes="neon-primary" Command="{Binding LaunchPlatformClientCommand}" CommandParameter="battlenet" Height="42" Padding="22,10">
+                                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                <PathIcon Data="{StaticResource IconPlay}" Width="12" Height="12" Foreground="#00162B" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding TxtLaunch}" FontWeight="ExtraBold" FontSize="13" Foreground="#00162B" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+
+                                <!-- 9. GOG GALAXY -->
+                                <Border Width="460" MinWidth="340" Background="#0C1B2E" BorderBrush="#409333EA" BorderThickness="1.5" CornerRadius="16" Padding="20,16" Margin="0,0,16,16" BoxShadow="0 6 20 #25000000">
+                                    <Grid ColumnDefinitions="Auto, *, Auto" VerticalAlignment="Center">
+                                        <Border Grid.Column="0" Width="58" Height="58" CornerRadius="14" Background="#14243B" BorderBrush="#25FFFFFF" BorderThickness="1" Margin="0,0,14,0">
+                                            <Image Source="{svg:SvgImage avares://ODZEN/Assets/gog.svg}" Width="34" Height="34" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="3">
+                                            <TextBlock Text="GOG Galaxy" FontSize="16" FontWeight="ExtraBold" Foreground="#FFFFFF" />
+                                            <TextBlock Text="GOG Galaxy Resmi İstemcisi" FontSize="12" Foreground="#94A3B8" />
+                                        </StackPanel>
+                                        <Button Grid.Column="2" Classes="neon-primary" Command="{Binding LaunchPlatformClientCommand}" CommandParameter="gog" Height="42" Padding="22,10">
+                                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                <PathIcon Data="{StaticResource IconPlay}" Width="12" Height="12" Foreground="#00162B" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding TxtLaunch}" FontWeight="ExtraBold" FontSize="13" Foreground="#00162B" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+
+                                <!-- 10. XBOX -->
+                                <Border Width="460" MinWidth="340" Background="#0C1B2E" BorderBrush="#40107C10" BorderThickness="1.5" CornerRadius="16" Padding="20,16" Margin="0,0,16,16" BoxShadow="0 6 20 #25000000">
+                                    <Grid ColumnDefinitions="Auto, *, Auto" VerticalAlignment="Center">
+                                        <Border Grid.Column="0" Width="58" Height="58" CornerRadius="14" Background="#14243B" BorderBrush="#25FFFFFF" BorderThickness="1" Margin="0,0,14,0">
+                                            <Image Source="{svg:SvgImage avares://ODZEN/Assets/xbox.svg}" Width="34" Height="34" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="3">
+                                            <TextBlock Text="Xbox PC" FontSize="16" FontWeight="ExtraBold" Foreground="#FFFFFF" />
+                                            <TextBlock Text="Microsoft Xbox PC İstemcisi" FontSize="12" Foreground="#94A3B8" />
+                                        </StackPanel>
+                                        <Button Grid.Column="2" Classes="neon-primary" Command="{Binding LaunchPlatformClientCommand}" CommandParameter="xbox" Height="42" Padding="22,10">
+                                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                <PathIcon Data="{StaticResource IconPlay}" Width="12" Height="12" Foreground="#00162B" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding TxtLaunch}" FontWeight="ExtraBold" FontSize="13" Foreground="#00162B" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+
+                            </WrapPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- 3. SETTINGS VIEW (RESPONSIVE WRAPPANEL DASHBOARD) -->
+                    <ScrollViewer IsVisible="{Binding IsSettingsOpen}" Margin="28,20" VerticalScrollBarVisibility="Auto">
+                        <StackPanel Spacing="20">
+                            <!-- Header -->
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="{Binding TxtAppSettings}" FontSize="24" FontWeight="ExtraBold" Foreground="#F8FAFC" />
+                                <TextBlock Text="{Binding TxtAppSettingsSubtitle}" FontSize="12" Foreground="#64748B" />
+                            </StackPanel>
+
+                            <!-- RESPONSIVE AUTO-COLLAPSING WRAPPANEL (2-COLUMN TO 1-COLUMN) -->
+                            <WrapPanel Orientation="Horizontal">
+                                
+                                <!-- 1. Dil Değiştirme (Neon Cyan Theme) -->
+                                <Border Width="450" MinWidth="340" Background="#0F1B2E" BorderBrush="#4000F0FF" BorderThickness="1.5" CornerRadius="14" Padding="18" Margin="0,0,16,16" BoxShadow="0 4 16 #20000000, 0 0 10 #1500F0FF">
+                                    <StackPanel Spacing="12">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <PathIcon Data="{StaticResource IconGlobe}" Width="16" Height="16" Foreground="#00F0FF" VerticalAlignment="Center" />
+                                            <TextBlock Text="{Binding TxtLanguageChange}" FontSize="14" FontWeight="Bold" Foreground="#00F0FF" VerticalAlignment="Center" />
+                                        </StackPanel>
+
+                                        <TextBlock Text="{Binding TxtLanguageDesc}" FontSize="11" Foreground="#94A3B8" TextWrapping="Wrap" />
+
+                                        <!-- 8 Language Selection Buttons Grid -->
+                                        <UniformGrid Columns="4" Rows="2">
+                                            <Button Classes="neon-primary" Command="{Binding ChangeLanguageCommand}" CommandParameter="0" Margin="2" Padding="0,8" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+                                                <TextBlock Text="🇹🇷 Türkçe" FontWeight="Bold" FontSize="11" Foreground="#00162B" />
+                                            </Button>
+                                            <Button Classes="neon-primary" Command="{Binding ChangeLanguageCommand}" CommandParameter="1" Margin="2" Padding="0,8" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+                                                <TextBlock Text="🇬🇧 English" FontWeight="Bold" FontSize="11" Foreground="#00162B" />
+                                            </Button>
+                                            <Button Classes="neon-primary" Command="{Binding ChangeLanguageCommand}" CommandParameter="2" Margin="2" Padding="0,8" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+                                                <TextBlock Text="🇩🇪 Deutsch" FontWeight="Bold" FontSize="11" Foreground="#00162B" />
+                                            </Button>
+                                            <Button Classes="neon-primary" Command="{Binding ChangeLanguageCommand}" CommandParameter="3" Margin="2" Padding="0,8" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+                                                <TextBlock Text="🇧🇬 Български" FontWeight="Bold" FontSize="11" Foreground="#00162B" />
+                                            </Button>
+                                            <Button Classes="neon-primary" Command="{Binding ChangeLanguageCommand}" CommandParameter="4" Margin="2" Padding="0,8" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+                                                <TextBlock Text="🇪🇸 Español" FontWeight="Bold" FontSize="11" Foreground="#00162B" />
+                                            </Button>
+                                            <Button Classes="neon-primary" Command="{Binding ChangeLanguageCommand}" CommandParameter="5" Margin="2" Padding="0,8" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+                                                <TextBlock Text="🇳🇱 Nederlands" FontWeight="Bold" FontSize="11" Foreground="#00162B" />
+                                            </Button>
+                                            <Button Classes="neon-primary" Command="{Binding ChangeLanguageCommand}" CommandParameter="6" Margin="2" Padding="0,8" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+                                                <TextBlock Text="🇫🇷 Français" FontWeight="Bold" FontSize="11" Foreground="#00162B" />
+                                            </Button>
+                                            <Button Classes="neon-primary" Command="{Binding ChangeLanguageCommand}" CommandParameter="7" Margin="2" Padding="0,8" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+                                                <TextBlock Text="🇷🇺 Русский" FontWeight="Bold" FontSize="11" Foreground="#00162B" />
+                                            </Button>
+                                        </UniformGrid>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- 2. Sistem Yapılandırması (Electric Sky Blue Theme) -->
+                                <Border Width="450" MinWidth="340" Background="#0C1B2E" BorderBrush="#4038BDF8" BorderThickness="1.5" CornerRadius="14" Padding="18" Margin="0,0,16,16" BoxShadow="0 4 16 #20000000, 0 0 10 #1538BDF8">
+                                    <StackPanel Spacing="12">
+                                        <TextBlock Text="{Binding TxtSystemConfig}" FontSize="14" FontWeight="Bold" Foreground="#38BDF8" />
+
+                                        <Grid ColumnDefinitions="*, Auto">
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock Text="{Binding TxtAutostart}" FontWeight="SemiBold" Foreground="#F8FAFC" TextWrapping="Wrap" />
+                                                <TextBlock Text="{Binding TxtAutostartDesc}" FontSize="11" Foreground="#94A3B8" TextWrapping="Wrap" />
+                                            </StackPanel>
+                                            <CheckBox Grid.Column="1" IsChecked="{Binding Autostart, Mode=TwoWay}" Margin="8,0,0,0" />
+                                        </Grid>
+
+                                        <Grid ColumnDefinitions="*, Auto">
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock Text="{Binding TxtMinimizeTray}" FontWeight="SemiBold" Foreground="#F8FAFC" TextWrapping="Wrap" />
+                                                <TextBlock Text="{Binding TxtMinimizeTrayDesc}" FontSize="11" Foreground="#94A3B8" TextWrapping="Wrap" />
+                                            </StackPanel>
+                                            <CheckBox Grid.Column="1" IsChecked="{Binding MinimizeToTrayOnClose, Mode=TwoWay}" Margin="8,0,0,0" />
+                                        </Grid>
+
+                                        <Grid ColumnDefinitions="*, Auto">
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock Text="{Binding TxtAutoScan}" FontWeight="SemiBold" Foreground="#F8FAFC" TextWrapping="Wrap" />
+                                                <TextBlock Text="{Binding TxtAutoScanDesc}" FontSize="11" Foreground="#94A3B8" TextWrapping="Wrap" />
+                                            </StackPanel>
+                                            <CheckBox Grid.Column="1" IsChecked="{Binding AutoScan}" Margin="8,0,0,0" />
+                                        </Grid>
+
+                                        <Grid ColumnDefinitions="*, Auto">
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock Text="{Binding TxtMetin2Detect}" FontWeight="SemiBold" Foreground="#F8FAFC" TextWrapping="Wrap" />
+                                                <TextBlock Text="{Binding TxtMetin2DetectDesc}" FontSize="11" Foreground="#94A3B8" TextWrapping="Wrap" />
+                                            </StackPanel>
+                                            <CheckBox Grid.Column="1" IsChecked="{Binding Metin2}" Margin="8,0,0,0" />
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- 3. Arayüz ve Görünüm Ölçeklendirmesi (Phosphor Green Theme) -->
+                                <Border Width="450" MinWidth="340" Background="#0D201A" BorderBrush="#45B4FF00" BorderThickness="1.5" CornerRadius="14" Padding="18" Margin="0,0,16,16" BoxShadow="0 4 16 #20000000, 0 0 10 #15B4FF00">
+                                    <StackPanel Spacing="12">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <PathIcon Data="{StaticResource IconMonitor}" Width="16" Height="16" Foreground="#B4FF00" VerticalAlignment="Center" />
+                                            <TextBlock Text="{Binding TxtUiScaleTitle}" FontSize="14" FontWeight="Bold" Foreground="#B4FF00" VerticalAlignment="Center" />
+                                        </StackPanel>
+
+                                        <Grid ColumnDefinitions="*, Auto">
+                                            <TextBlock Grid.Column="0" Text="{Binding TxtUiScaleDesc}" FontSize="11" Foreground="#94A3B8" TextWrapping="Wrap" />
+                                            <TextBlock Grid.Column="1" Text="{Binding PendingUiScaleText}" FontWeight="Bold" Foreground="#B4FF00" FontSize="15" Margin="8,0,0,0" VerticalAlignment="Center" />
+                                        </Grid>
+
+                                        <!-- Scale Selection Buttons -->
+                                        <Grid ColumnDefinitions="*, *, *, *">
+                                            <Button Grid.Column="0" Classes="glass-btn" Command="{Binding SelectScaleCandidateCommand}" CommandParameter="0.85" Content="%85" Margin="0,0,4,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                                            <Button Grid.Column="1" Classes="glass-btn" Command="{Binding SelectScaleCandidateCommand}" CommandParameter="1.0" Content="%100" Margin="2,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                                            <Button Grid.Column="2" Classes="glass-btn" Command="{Binding SelectScaleCandidateCommand}" CommandParameter="1.15" Content="%115" Margin="2,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                                            <Button Grid.Column="3" Classes="glass-btn" Command="{Binding SelectScaleCandidateCommand}" CommandParameter="1.30" Content="%130" Margin="4,0,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                                        </Grid>
+
+                                        <!-- Slider + Apply Button -->
+                                        <Slider Value="{Binding PendingUiScale, Mode=TwoWay}" Minimum="0.80" Maximum="1.40" SmallChange="0.05" LargeChange="0.10" />
+
+                                        <Button Classes="neon-primary" Command="{Binding ApplyUiScaleCommand}" HorizontalAlignment="Stretch" Height="36">
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6">
+                                                <PathIcon Data="{StaticResource IconBolt}" Width="12" Height="12" Foreground="#00162B" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding TxtApplyScale}" FontWeight="Bold" FontSize="12" Foreground="#00162B" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- 4. Çevrimiçi Medya ve Logo Yapılandırması (Violet Purple Theme) -->
+                                <Border Width="450" MinWidth="340" Background="#1A122E" BorderBrush="#40A855F7" BorderThickness="1.5" CornerRadius="14" Padding="18" Margin="0,0,16,16" BoxShadow="0 4 16 #20000000, 0 0 10 #15A855F7">
+                                    <StackPanel Spacing="12">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <PathIcon Data="{StaticResource IconGlobe}" Width="16" Height="16" Foreground="#A855F7" VerticalAlignment="Center" />
+                                            <TextBlock Text="{Binding TxtOnlineMediaConfig}" FontSize="14" FontWeight="Bold" Foreground="#A855F7" VerticalAlignment="Center" />
+                                        </StackPanel>
+
+                                        <Grid ColumnDefinitions="*, Auto">
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock Text="{Binding TxtDownloadOnlineLogos}" FontWeight="SemiBold" Foreground="#F8FAFC" TextWrapping="Wrap" />
+                                                <TextBlock Text="{Binding TxtDownloadOnlineLogosDesc}" FontSize="11" Foreground="#94A3B8" TextWrapping="Wrap" />
+                                            </StackPanel>
+                                            <CheckBox Grid.Column="1" IsChecked="{Binding FetchLogosFromInternet, Mode=TwoWay}" Margin="8,0,0,0" />
+                                        </Grid>
+
+                                        <Grid ColumnDefinitions="*, Auto">
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock Text="{Binding TxtRefreshAllLogos}" FontWeight="SemiBold" Foreground="#F8FAFC" TextWrapping="Wrap" />
+                                                <TextBlock Text="{Binding TxtRefreshAllLogosDesc}" FontSize="11" Foreground="#94A3B8" TextWrapping="Wrap" />
+                                            </StackPanel>
+                                            <Button Grid.Column="1" Classes="neon-primary" Command="{Binding RefreshOnlineLogosCommand}" Padding="14,6" Margin="8,0,0,0">
+                                                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                                    <PathIcon Data="{StaticResource IconSync}" Width="13" Height="13" Foreground="#00162B" VerticalAlignment="Center" />
+                                                    <TextBlock Text="{Binding TxtRefreshLogosBtn}" FontSize="12" FontWeight="Bold" Foreground="#00162B" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </Button>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- 5. Vitrin & Görünüm Tercihleri (Amber Gold Theme) -->
+                                <Border Width="450" MinWidth="340" Background="#201C12" BorderBrush="#40FBBF24" BorderThickness="1.5" CornerRadius="14" Padding="18" Margin="0,0,16,16" BoxShadow="0 4 16 #20000000, 0 0 10 #15FBBF24">
+                                    <StackPanel Spacing="12">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <PathIcon Data="{StaticResource IconStar}" Width="16" Height="16" Foreground="#FBBF24" VerticalAlignment="Center" />
+                                            <TextBlock Text="{Binding TxtShowcaseTitle}" FontSize="14" FontWeight="Bold" Foreground="#FBBF24" VerticalAlignment="Center" />
+                                        </StackPanel>
+
+                                        <Grid ColumnDefinitions="*, Auto">
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock Text="{Binding TxtShowShowcaseOpt}" FontWeight="SemiBold" Foreground="#F8FAFC" TextWrapping="Wrap" />
+                                                <TextBlock Text="{Binding TxtShowShowcaseDesc}" FontSize="11" Foreground="#94A3B8" TextWrapping="Wrap" />
+                                            </StackPanel>
+                                            <CheckBox Grid.Column="1" IsChecked="{Binding ShowShowcase, Mode=TwoWay}" Margin="8,0,0,0" />
+                                        </Grid>
+
+                                        <Grid ColumnDefinitions="*, Auto">
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock Text="{Binding TxtShowMusicOpt}" FontWeight="SemiBold" Foreground="#F8FAFC" TextWrapping="Wrap" />
+                                                <TextBlock Text="{Binding TxtShowMusicDesc}" FontSize="11" Foreground="#94A3B8" TextWrapping="Wrap" />
+                                            </StackPanel>
+                                            <CheckBox Grid.Column="1" IsChecked="{Binding ShowMusicButton, Mode=TwoWay}" Margin="8,0,0,0" />
+                                        </Grid>
+
+                                        <Grid ColumnDefinitions="*, Auto">
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock Text="{Binding TxtShowDiscordOpt}" FontWeight="SemiBold" Foreground="#F8FAFC" TextWrapping="Wrap" />
+                                                <TextBlock Text="{Binding TxtShowDiscordDesc}" FontSize="11" Foreground="#94A3B8" TextWrapping="Wrap" />
+                                            </StackPanel>
+                                            <CheckBox Grid.Column="1" IsChecked="{Binding ShowDiscordButton, Mode=TwoWay}" Margin="8,0,0,0" />
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- 6. Akıllı Arka Plan Oyun Algılama (Neon Magenta Theme) -->
+                                <Border Width="450" MinWidth="340" Background="#221024" BorderBrush="#40EC4899" BorderThickness="1.5" CornerRadius="14" Padding="18" Margin="0,0,16,16" BoxShadow="0 4 16 #20000000, 0 0 10 #15EC4899">
+                                    <StackPanel Spacing="12">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <PathIcon Data="{StaticResource IconBolt}" Width="15" Height="15" Foreground="#EC4899" VerticalAlignment="Center" />
+                                            <TextBlock Text="{Binding TxtAiEngine}" FontSize="14" FontWeight="Bold" Foreground="#EC4899" VerticalAlignment="Center" />
+                                        </StackPanel>
+
+                                        <Grid ColumnDefinitions="*, Auto">
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock Text="{Binding TxtAiDetection}" FontWeight="SemiBold" Foreground="#F8FAFC" TextWrapping="Wrap" />
+                                                <TextBlock Text="{Binding TxtAiDetectionDesc}" FontSize="11" Foreground="#94A3B8" TextWrapping="Wrap" />
+                                            </StackPanel>
+                                            <CheckBox Grid.Column="1" IsChecked="{Binding AiDetection}" Margin="8,0,0,0" />
+                                        </Grid>
+
+                                        <StackPanel Spacing="3">
+                                            <Grid ColumnDefinitions="*, Auto">
+                                                <TextBlock Grid.Column="0" Text="{Binding TxtGpuThreshold}" FontWeight="SemiBold" Foreground="#F8FAFC" TextWrapping="Wrap" />
+                                                <TextBlock Grid.Column="1" Text="{Binding GpuThresholdText}" FontWeight="Bold" Foreground="#B4FF00" FontSize="13" />
+                                            </Grid>
+                                            <Slider Value="{Binding GpuThreshold, Mode=TwoWay}" Minimum="50" Maximum="95" TickFrequency="5" IsSnapToTickEnabled="True" SmallChange="5" LargeChange="5" />
+                                        </StackPanel>
+
+                                        <StackPanel Spacing="3">
+                                            <Grid ColumnDefinitions="*, Auto">
+                                                <TextBlock Grid.Column="0" Text="{Binding TxtCpuThreshold}" FontWeight="SemiBold" Foreground="#F8FAFC" TextWrapping="Wrap" />
+                                                <TextBlock Grid.Column="1" Text="{Binding CpuThresholdText}" FontWeight="Bold" Foreground="#B4FF00" FontSize="13" />
+                                            </Grid>
+                                            <Slider Value="{Binding CpuThreshold, Mode=TwoWay}" Minimum="15" Maximum="80" TickFrequency="5" IsSnapToTickEnabled="True" SmallChange="5" LargeChange="5" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- 7. Geliştirici & Telif Hakları (Cyan / Glow Theme) -->
+                                <Border Width="450" MinWidth="340" Background="#0C1B2E" BorderBrush="#4000F0FF" BorderThickness="1.5" CornerRadius="14" Padding="18" Margin="0,0,16,16" BoxShadow="0 4 16 #20000000, 0 0 10 #1500F0FF">
+                                    <StackPanel Spacing="12">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <PathIcon Data="{StaticResource IconGlobe}" Width="15" Height="15" Foreground="#00F0FF" VerticalAlignment="Center" />
+                                            <TextBlock Text="{Binding TxtDeveloperCredits}" FontSize="14" FontWeight="Bold" Foreground="#00F0FF" VerticalAlignment="Center" />
+                                        </StackPanel>
+
+                                        <Grid ColumnDefinitions="*, Auto">
+                                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                <TextBlock Text="Taroxzen" FontWeight="ExtraBold" FontSize="14" Foreground="#F8FAFC" />
+                                                <TextBlock Text="https://github.com/taroxzen" FontSize="11" Foreground="#94A3B8" />
+                                            </StackPanel>
+                                            <Button Grid.Column="1" Classes="neon-primary" Command="{Binding OpenGitHubProfileCommand}" Padding="14,8" Margin="8,0,0,0">
+                                                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                                    <TextBlock Text="🐙" FontSize="13" VerticalAlignment="Center" />
+                                                    <TextBlock Text="{Binding TxtVisitGitHub}" FontSize="12" FontWeight="Bold" Foreground="#00162B" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </Button>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+                            </WrapPanel>
+
+                            <!-- Actions (Ayarları Sıfırla & Kapat/Geri Dön) -->
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12" Margin="0,10,0,20">
+                                <Button Classes="glass-btn" Command="{Binding ResetSettingsToDefaultCommand}" Padding="18,8" ToolTip.Tip="Tüm uygulama ayarlarını fabrika varsayılanına döndür">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <PathIcon Data="{StaticResource IconTrash}" Width="12" Height="12" Foreground="#FF4444" VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding TxtResetSettings}" FontWeight="Bold" Foreground="#FF6666" FontSize="12" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+                                <Button Classes="neon-primary" Command="{Binding BackToGamesCommand}" Content="{Binding TxtSaveSettings}" Padding="24,8" />
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- CANLI TOAST POPUP BİLDİRİMİ -->
+                    <Border IsVisible="{Binding IsToastVisible}"
+                            HorizontalAlignment="Right" VerticalAlignment="Top" 
+                            Margin="0,20,30,0" 
+                            Background="#1A253E" 
+                            BorderBrush="#B4FF00" 
+                            BorderThickness="1.5" 
+                            CornerRadius="12" 
+                            Padding="16,12" 
+                            MaxWidth="440"
+                            ZIndex="210">
+                        <Grid ColumnDefinitions="*, Auto">
+                            <TextBlock Grid.Column="0" Text="{Binding ToastMessage}" Foreground="#F8FAFC" FontWeight="Bold" FontSize="12" TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <Button Grid.Column="1" Classes="glass-btn" Command="{Binding CloseToastCommand}" Width="26" Height="26" Padding="0" Margin="10,0,0,0">
+                                <TextBlock Text="✕" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Button>
+                        </Grid>
+                    </Border>
+
+                    <!-- OYUN BULUNDU BİLDİRİMİ / ONAY KARTIKUTUSU (SAĞ ALT) -->
+                    <Border IsVisible="{Binding IsAiDetectionPromptOpen}"
+                            HorizontalAlignment="Right" VerticalAlignment="Bottom" 
+                            Margin="0,0,28,28" 
+                            Background="#161D2B" 
+                            BorderBrush="#B4FF00" 
+                            BorderThickness="1.5" 
+                            CornerRadius="14" 
+                            Padding="18,16" 
+                            Width="390"
+                            ZIndex="300"
+                            BoxShadow="0 16 40 #90000000, 0 0 20 #25B4FF00">
+                        <StackPanel Spacing="12">
+                            <Grid ColumnDefinitions="Auto, *, Auto">
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                    <PathIcon Data="{StaticResource IconBolt}" Width="15" Height="15" Foreground="#B4FF00" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding TxtAiPromptTitle}" FontWeight="Bold" FontSize="13" Foreground="#B4FF00" VerticalAlignment="Center" />
+                                </StackPanel>
+                                <Button Grid.Column="2" Classes="glass-btn" Command="{Binding DismissDetectedGameCommand}" Width="26" Height="26" Padding="0" CornerRadius="13">
+                                    <TextBlock Text="✕" FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Button>
+                            </Grid>
+
+                            <TextBlock Text="{Binding DetectedGameName, StringFormat='&quot;{0}&quot; çalışırken algılandı. Kütüphanenize eklensin mi?'}" 
+                                       Foreground="#F8FAFC" FontSize="12" LineHeight="18" TextWrapping="Wrap" />
+
+                            <!-- AKSİYON BUTONLARI -->
+                            <Grid ColumnDefinitions="*, 10, Auto" Margin="0,4,0,0">
+                                <Button Grid.Column="0" Classes="neon-primary" Command="{Binding ConfirmAddDetectedGameCommand}" Height="36" Padding="14,0" CornerRadius="8">
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6">
+                                        <TextBlock Text="✓" FontWeight="Bold" FontSize="12" Foreground="#00162B" />
+                                        <TextBlock Text="{Binding TxtYesAdd}" FontWeight="Bold" FontSize="12" Foreground="#00162B" />
+                                    </StackPanel>
+                                </Button>
+                                <Button Grid.Column="2" Classes="glass-btn" Command="{Binding DismissDetectedGameCommand}" Height="36" Padding="16,0" CornerRadius="8">
+                                    <TextBlock Text="{Binding TxtNoDismiss}" FontWeight="SemiBold" FontSize="12" Foreground="#94A3B8" VerticalAlignment="Center" />
+                                </Button>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- ================= CINEMATIC GAME SHOWCASE & ACTION CONTROLS MODAL ================= -->
+                    <Border IsVisible="{Binding IsGameDetailOpen}" Background="#E0050B14" ZIndex="150" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Width="840" MaxHeight="660">
+                            <Border Background="#0C1322" BorderBrush="#25FFFFFF" BorderThickness="1" CornerRadius="16" ClipToBounds="True" BoxShadow="0 24 64 #90000000">
+                                <Grid RowDefinitions="180, *">
+                                    <!-- Hero Top Banner Area with Ambient Glass Effect -->
+                                    <Border Grid.Row="0" Background="#080D18" CornerRadius="15,15,0,0" ClipToBounds="True">
+                                        <Grid>
+                                            <Border Background="#090E1A" />
+                                            <Border Background="#05FFFFFF" Margin="14" CornerRadius="10" BorderBrush="#15FFFFFF" BorderThickness="1" />
+
+                                            <!-- Large Centered Transparent Game Logo -->
+                                            <Image Source="{Binding SelectedGame.GameIcon}" 
+                                                   Margin="35,12"
+                                                   HorizontalAlignment="Center" 
+                                                   VerticalAlignment="Center" 
+                                                   Stretch="Uniform" />
+
+                                            <!-- Close Button -->
+                                            <Button HorizontalAlignment="Right" VerticalAlignment="Top" Margin="18" 
+                                                    Command="{Binding CloseGameDetailCommand}"
+                                                    Background="#40000000" CornerRadius="20" Width="34" Height="34" Cursor="Hand">
+                                                <PathIcon Data="{StaticResource IconClose}" Width="12" Height="12" Foreground="#F8FAFC" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Button>
+
+                                            <!-- Platform Badge -->
+                                            <Border HorizontalAlignment="Left" VerticalAlignment="Top" Margin="18" Background="#C0000000" CornerRadius="8" Padding="10,4">
+                                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                                    <PathIcon Data="{StaticResource IconGamepad}" Width="12" Height="12" Foreground="#00F0FF" VerticalAlignment="Center" />
+                                                    <TextBlock Text="{Binding SelectedGame.PlatformName}" FontSize="11" FontWeight="Bold" Foreground="#00F0FF" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </Border>
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- Bottom Content & Action Controls -->
+                                    <Border Grid.Row="1" Background="#0C1322" CornerRadius="0,0,15,15" Padding="24,18">
+                                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                            <StackPanel Spacing="14">
+                                                <!-- 1. Game Name Edit & Favorite -->
+                                                <Grid ColumnDefinitions="*, Auto" Margin="0,0,0,4">
+                                                    <StackPanel Grid.Column="0" Spacing="4">
+                                                        <TextBlock Text="{Binding TxtGameTitle}" FontSize="10" FontWeight="Bold" Foreground="#64748B" />
+                                                        <TextBox Text="{Binding SelectedGame.Name, Mode=TwoWay}" FontSize="16" FontWeight="Bold" Background="#111A2E" BorderBrush="#25FFFFFF" Foreground="#F8FAFC" Padding="10,6" CornerRadius="8" />
+                                                    </StackPanel>
+                                                    <Button Grid.Column="1" Command="{Binding ToggleFavoriteCommand}" CommandParameter="{Binding SelectedGame}" Classes="glass-btn" Margin="12,18,0,0" Padding="14,8">
+                                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                                            <PathIcon Data="{StaticResource IconStar}" Width="13" Height="13" Foreground="#FBBF24" VerticalAlignment="Center" />
+                                                            <TextBlock Text="{Binding TxtFavorites}" FontWeight="Bold" Foreground="#F8FAFC" VerticalAlignment="Center" />
+                                                        </StackPanel>
+                                                    </Button>
+                                                </Grid>
+
+                                                <!-- 2. Logo & Media Customization Controls -->
+                                                <Border Background="#111A2E" BorderBrush="#15FFFFFF" BorderThickness="1" CornerRadius="10" Padding="14">
+                                                    <Grid ColumnDefinitions="*, Auto, Auto, Auto" VerticalAlignment="Center">
+                                                        <StackPanel Grid.Column="0" Spacing="2">
+                                                            <TextBlock Text="{Binding TxtCustomLogoMedia}" FontWeight="Bold" Foreground="#00F0FF" FontSize="12" />
+                                                            <TextBlock Text="{Binding SelectedGame.CustomLogoPath, TargetNullValue='Otomatik Aktif'}" FontSize="11" Foreground="#64748B" TextTrimming="CharacterEllipsis" />
+                                                        </StackPanel>
+                                                        
+                                                        <!-- Pick Custom Logo -->
+                                                        <Button Grid.Column="1" Classes="glass-btn" Command="{Binding PickCustomLogoCommand}" Margin="6,0" Padding="10,6" ToolTip.Tip="Bilgisayardan Özel PNG/ICO Logo Seç">
+                                                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                                                <PathIcon Data="{StaticResource IconImage}" Width="13" Height="13" Foreground="#00F0FF" VerticalAlignment="Center" />
+                                                                <TextBlock Text="{Binding TxtChangeLogo}" FontSize="11" FontWeight="Bold" VerticalAlignment="Center" />
+                                                            </StackPanel>
+                                                        </Button>
+
+                                                        <!-- Revert to System Local Logo -->
+                                                        <Button Grid.Column="2" Classes="glass-btn" Command="{Binding ClearCustomLogoCommand}" Margin="0,0,6,0" Padding="10,6" ToolTip.Tip="Bilgisayardaki Orijinal Sistem (.exe/Yerel) Logosuna Dön">
+                                                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                                                <PathIcon Data="{StaticResource IconFolder}" Width="12" Height="12" Foreground="#B4FF00" VerticalAlignment="Center" />
+                                                                <TextBlock Text="{Binding TxtSystemLogo}" FontSize="11" Foreground="#B4FF00" VerticalAlignment="Center" />
+                                                            </StackPanel>
+                                                        </Button>
+
+                                                        <!-- Use Cloud/Online Logo -->
+                                                        <Button Grid.Column="3" Classes="glass-btn" Command="{Binding UseOnlineLogoCommand}" Padding="10,6" ToolTip.Tip="Steam Store ve Çevrimiçi Açık HD/4K Logoyu Kullan">
+                                                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                                                <PathIcon Data="{StaticResource IconGlobe}" Width="12" Height="12" Foreground="#00F0FF" VerticalAlignment="Center" />
+                                                                <TextBlock Text="{Binding TxtOnlineLogo}" FontSize="11" Foreground="#00F0FF" VerticalAlignment="Center" />
+                                                            </StackPanel>
+                                                        </Button>
+                                                    </Grid>
+                                                </Border>
+
+                                                <!-- 3. Launch Commands & Arguments -->
+                                                <Grid ColumnDefinitions="*, 12, *">
+                                                    <StackPanel Grid.Column="0" Spacing="4">
+                                                        <TextBlock Text="{Binding TxtLaunchArgs}" FontSize="10" FontWeight="Bold" Foreground="#64748B" />
+                                                        <TextBox Text="{Binding SelectedGame.LaunchArgs, Mode=TwoWay}" Watermark="Örn: -novid -fullscreen -high" FontSize="12" Background="#111A2E" BorderBrush="#25FFFFFF" Foreground="#F8FAFC" Padding="10,6" CornerRadius="8" />
+                                                    </StackPanel>
+
+                                                    <StackPanel Grid.Column="2" Spacing="4">
+                                                        <TextBlock Text="{Binding TxtQuickLaunch}" FontSize="10" FontWeight="Bold" Foreground="#64748B" />
+                                                        <TextBox Text="{Binding SelectedGame.QuickLaunchCommand, Mode=TwoWay}" Watermark="Örn: steam://rungameid/..." FontSize="12" Background="#111A2E" BorderBrush="#25FFFFFF" Foreground="#F8FAFC" Padding="10,6" CornerRadius="8" />
+                                                    </StackPanel>
+                                                </Grid>
+
+                                                <Separator Background="#15FFFFFF" Margin="0,4" />
+
+                                                <!-- 4. Action Buttons Bar -->
+                                                <Grid ColumnDefinitions="Auto, *, Auto, Auto, Auto, Auto">
+                                                    <!-- Main Play Button -->
+                                                    <Button Grid.Column="0" Classes="primary-play-btn" Command="{Binding LaunchGameCommand}" CommandParameter="{Binding SelectedGame}" Height="42" Padding="28,0">
+                                                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                            <PathIcon Data="{StaticResource IconPlay}" Width="13" Height="13" Foreground="#090E17" VerticalAlignment="Center" />
+                                                            <TextBlock Text="{Binding TxtPlayNow}" FontWeight="ExtraBold" FontSize="13" Foreground="#090E17" VerticalAlignment="Center" />
+                                                        </StackPanel>
+                                                    </Button>
+
+                                                    <!-- Open Folder -->
+                                                    <Button Grid.Column="2" Classes="glass-btn" Command="{Binding OpenGameFolderCommand}" CommandParameter="{Binding SelectedGame}" Height="42" Padding="14,0" Margin="0,0,8,0" ToolTip.Tip="Oyunun Kurulu Olduğu Klasörü Aç">
+                                                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                                            <PathIcon Data="{StaticResource IconFolder}" Width="13" Height="13" Foreground="#F8FAFC" VerticalAlignment="Center" />
+                                                            <TextBlock Text="{Binding TxtFolder}" FontWeight="Bold" FontSize="12" Foreground="#F8FAFC" VerticalAlignment="Center" />
+                                                        </StackPanel>
+                                                    </Button>
+
+                                                    <!-- Desktop Shortcut Button -->
+                                                    <Button Grid.Column="3" Classes="glass-btn" Command="{Binding CreateDesktopShortcutCommand}" CommandParameter="{Binding SelectedGame}" Height="42" Padding="14,0" Margin="0,0,8,0" ToolTip.Tip="Masaüstüne Hızlı Başlatma Kısayolu Oluştur">
+                                                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                                            <PathIcon Data="{StaticResource IconMonitor}" Width="13" Height="13" Foreground="#00F0FF" VerticalAlignment="Center" />
+                                                            <TextBlock Text="{Binding TxtDesktopShortcut}" FontWeight="Bold" FontSize="12" Foreground="#00F0FF" VerticalAlignment="Center" />
+                                                        </StackPanel>
+                                                    </Button>
+
+                                                    <!-- Delete from library button -->
+                                                    <Button Grid.Column="4" Classes="glass-btn" Command="{Binding DeleteCurrentGameCommand}" Height="42" Padding="14,0" Margin="0,0,8,0" Background="#30FF0000" BorderBrush="#80FF0000">
+                                                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                                            <PathIcon Data="{StaticResource IconTrash}" Width="13" Height="13" Foreground="#FF4444" VerticalAlignment="Center" />
+                                                            <TextBlock Text="{Binding TxtRemove}" FontWeight="Bold" FontSize="12" Foreground="#FF4444" VerticalAlignment="Center" />
+                                                        </StackPanel>
+                                                    </Button>
+
+                                                    <!-- Save & Close -->
+                                                    <Button Grid.Column="5" Classes="neon-primary" Command="{Binding SaveGameConfigCommand}" Height="42" Padding="20,0">
+                                                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                                            <PathIcon Data="{StaticResource IconSave}" Width="13" Height="13" Foreground="#00162B" VerticalAlignment="Center" />
+                                                            <TextBlock Text="{Binding TxtSave}" FontWeight="Bold" FontSize="12" VerticalAlignment="Center" />
+                                                        </StackPanel>
+                                                    </Button>
+                                                </Grid>
+                                            </StackPanel>
+                                        </ScrollViewer>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <!-- ================= DUAL-MODE ADD GAME & RUNNING APPS MODAL ================= -->
+                    <Border IsVisible="{Binding IsAddGameModalOpen}" Background="#E0050B14" ZIndex="200" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Width="880" Height="540">
+                            <Border Background="#0C1322" BorderBrush="#25FFFFFF" BorderThickness="1" CornerRadius="16" ClipToBounds="True" BoxShadow="0 24 64 #90000000">
+                                <Grid RowDefinitions="Auto, *">
+                                    
+                                    <!-- Modal Header -->
+                                    <Border Grid.Row="0" Background="#10182C" CornerRadius="15,15,0,0" Padding="20,16" BorderBrush="#20FFFFFF" BorderThickness="0,0,0,1">
+                                        <Grid ColumnDefinitions="*, Auto">
+                                            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                                <PathIcon Data="{StaticResource IconPlus}" Width="16" Height="16" Foreground="#B4FF00" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding TxtAddGameTitle}" FontSize="16" FontWeight="ExtraBold" Foreground="#F8FAFC" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                            <Button Grid.Column="1" Classes="glass-btn" Command="{Binding CloseAddGameModalCommand}" Width="32" Height="32" Padding="0">
+                                                <TextBlock Text="✕" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#94A3B8" />
+                                            </Button>
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- Modal Body (2 Columns: Left = Running Windows, Right = Manual Add) -->
+                                    <Grid Grid.Row="1" ColumnDefinitions="*, 1, *">
+                                        
+                                        <!-- LEFT COLUMN: OPEN RUNNING APPLICATIONS -->
+                                        <Grid Grid.Column="0" RowDefinitions="Auto, *" Margin="18,14">
+                                            <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Margin="0,0,0,10">
+                                                <TextBlock Grid.Column="0" Text="{Binding TxtRunningAppsTitle}" FontSize="12" FontWeight="Bold" Foreground="#00F0FF" VerticalAlignment="Center" />
+                                                <Button Grid.Column="1" Classes="glass-btn" Command="{Binding OpenAddGameModalCommand}" Padding="8,4">
+                                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                                        <PathIcon Data="{StaticResource IconSync}" Width="10" Height="10" Foreground="#00F0FF" VerticalAlignment="Center" />
+                                                        <TextBlock Text="{Binding TxtRefresh}" FontSize="10" FontWeight="Bold" Foreground="#00F0FF" VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                </Button>
+                                            </Grid>
+
+                                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                                <ItemsControl ItemsSource="{Binding RunningApps}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate DataType="{x:Type models:RunningAppItem}">
+                                                            <Border Background="#121A2E" BorderBrush="#20FFFFFF" BorderThickness="1" CornerRadius="10" Padding="10,8" Margin="0,0,6,8">
+                                                                <Grid ColumnDefinitions="Auto, *, Auto">
+                                                                    <!-- Process/App Icon -->
+                                                                    <Border Grid.Column="0" Width="32" Height="32" CornerRadius="6" Background="#0C1322" Margin="0,0,10,0">
+                                                                        <Panel>
+                                                                            <Image Source="{Binding Icon}" Width="24" Height="24" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding HasIcon}" />
+                                                                            <PathIcon Data="{StaticResource IconGamepad}" Width="14" Height="14" Foreground="#00F0FF" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding !HasIcon}" />
+                                                                        </Panel>
+                                                                    </Border>
+
+                                                                    <!-- Process Title -->
+                                                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="12" Foreground="#F8FAFC" TextTrimming="CharacterEllipsis" />
+                                                                        <TextBlock Text="{Binding ProcessName}" FontSize="10" Foreground="#64748B" TextTrimming="CharacterEllipsis" />
+                                                                    </StackPanel>
+
+                                                                    <!-- Add Button -->
+                                                                    <Button Grid.Column="2" Classes="neon-primary" 
+                                                                            Command="{Binding $parent[Window].((vm:MainViewModel)DataContext).AddRunningAppCommand}" 
+                                                                            CommandParameter="{Binding}"
+                                                                            Padding="10,4" Margin="6,0,0,0">
+                                                                        <StackPanel Orientation="Horizontal" Spacing="4">
+                                                                            <PathIcon Data="{StaticResource IconPlus}" Width="10" Height="10" Foreground="#00162B" VerticalAlignment="Center" />
+                                                                            <TextBlock Text="{Binding $parent[Window].((vm:MainViewModel)DataContext).TxtAdd}" FontSize="11" FontWeight="Bold" Foreground="#00162B" VerticalAlignment="Center" />
+                                                                        </StackPanel>
+                                                                    </Button>
+                                                                </Grid>
+                                                            </Border>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </ScrollViewer>
+                                        </Grid>
+
+                                        <!-- SEPARATOR -->
+                                        <Rectangle Grid.Column="1" Fill="#20FFFFFF" VerticalAlignment="Stretch" Margin="0,14" />
+
+                                        <!-- RIGHT COLUMN: MANUAL FILE BROWSER & SETUP -->
+                                        <Grid Grid.Column="2" RowDefinitions="Auto, *" Margin="18,14">
+                                            <TextBlock Grid.Row="0" Text="{Binding TxtManualAddTitle}" FontSize="12" FontWeight="Bold" Foreground="#B4FF00" Margin="0,0,0,12" />
+
+                                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                                <StackPanel Spacing="14">
+                                                    <!-- Browse File Button -->
+                                                    <Button Classes="glass-btn" Command="{Binding BrowseManualGameCommand}" Height="40" Padding="14,0" HorizontalAlignment="Stretch">
+                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8" VerticalAlignment="Center">
+                                                            <PathIcon Data="{StaticResource IconFolder}" Width="14" Height="14" Foreground="#00F0FF" VerticalAlignment="Center" />
+                                                            <TextBlock Text="{Binding TxtBrowseExe}" FontWeight="Bold" FontSize="12" Foreground="#F8FAFC" VerticalAlignment="Center" />
+                                                        </StackPanel>
+                                                    </Button>
+
+                                                    <!-- Selected Path Display -->
+                                                    <StackPanel Spacing="4">
+                                                        <TextBlock Text="{Binding TxtFilePath}" FontSize="10" FontWeight="Bold" Foreground="#64748B" />
+                                                        <TextBox Text="{Binding ManualGamePath, Mode=TwoWay}" Watermark="C:\Games\Game.exe" FontSize="11" Background="#111A2E" BorderBrush="#25FFFFFF" Foreground="#F8FAFC" Padding="10,6" CornerRadius="8" IsReadOnly="True" />
+                                                    </StackPanel>
+
+                                                    <!-- Game Name -->
+                                                    <StackPanel Spacing="4">
+                                                        <TextBlock Text="{Binding TxtGameTitle}" FontSize="10" FontWeight="Bold" Foreground="#64748B" />
+                                                        <TextBox Text="{Binding ManualGameName, Mode=TwoWay}" Watermark="Game Name" FontSize="13" FontWeight="Bold" Background="#111A2E" BorderBrush="#25FFFFFF" Foreground="#F8FAFC" Padding="10,6" CornerRadius="8" />
+                                                    </StackPanel>
+
+                                                    <!-- Launch Arguments -->
+                                                    <StackPanel Spacing="4">
+                                                        <TextBlock Text="{Binding TxtLaunchArgsOptional}" FontSize="10" FontWeight="Bold" Foreground="#64748B" />
+                                                        <TextBox Text="{Binding ManualGameArgs, Mode=TwoWay}" Watermark="-novid -fullscreen" FontSize="11" Background="#111A2E" BorderBrush="#25FFFFFF" Foreground="#F8FAFC" Padding="10,6" CornerRadius="8" />
+                                                    </StackPanel>
+
+                                                    <!-- Save Manual Game Button -->
+                                                    <Button Classes="neon-primary" Command="{Binding SaveManualGameCommand}" Height="42" HorizontalAlignment="Stretch" Margin="0,8,0,0">
+                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6">
+                                                            <PathIcon Data="{StaticResource IconSave}" Width="13" Height="13" Foreground="#00162B" VerticalAlignment="Center" />
+                                                            <TextBlock Text="{Binding TxtAddToLibraryBtn}" FontWeight="ExtraBold" FontSize="13" Foreground="#00162B" VerticalAlignment="Center" />
+                                                        </StackPanel>
+                                                    </Button>
+                                                </StackPanel>
+                                            </ScrollViewer>
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                </Grid>
+            </Grid>
+        </Grid>
+        </LayoutTransformControl>
+    </Border>
+</Window>

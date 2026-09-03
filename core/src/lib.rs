@@ -1,40 +1,45 @@
-﻿// ============================================================================
-// ODZEN Core — Unified Rust Core Engine
+// ============================================================================
+// ONYX Launcher — Game Scanner Engine (Rust Core)
 // Developed by Taroxzen (https://github.com/taroxzen)
 // Copyright (c) 2026 Taroxzen. All rights reserved.
 // Licensed under the MIT License.
 // ============================================================================
-//! # ODZEN Core
+//! # gamefind
 //!
-//! Unified, high-performance native engine for ODZEN Gaming Platform:
-//! - Multi-threaded game discovery across 13+ launchers and local directories.
-//! - 4K artwork & logo resolving pipeline with SIMD transparency auto-cropping.
-//! - Process and protocol game execution with argument escaping and CWD resolution.
-//! - Hardware diagnostics and music streaming launcher integrations.
+//! Local Windows game discovery engine. Scans installed games from Steam, Epic,
+//! Xbox, EA, Riot, Rockstar, and Minecraft (including CurseForge / Prism instances).
+//!
+//! This crate is **library-first**: UI authors consume [`GameFindEngine`] and
+//! [`ScanReport`] (or shell out to the `gamefind` CLI with `--json`).
+//!
+//! ## Example
+//!
+//! ```no_run
+//! use odzen_game_scanner::{GameFindEngine, ScanOptions};
+//!
+//! let engine = GameFindEngine::new();
+//! let report = engine.scan(ScanOptions::default()).unwrap();
+//! for game in report.games {
+//!     println!("{} [{}]", game.name, game.platform);
+//! }
+//! ```
 
 #![cfg_attr(not(windows), allow(dead_code, unused_imports))]
 
-pub mod artwork;
-pub mod error;
-pub mod launcher;
-pub mod models;
+mod engine;
+mod error;
+mod model;
 pub mod music;
-pub mod scanner;
-pub mod sysinfo;
-pub mod util;
+pub mod artwork;
+mod scanners;
+mod util;
 
-// Backward-compatibility and ergonomic module aliases
-pub use models as model;
-pub use scanner as scanners;
-
-// Public Top-Level API Exports
-pub use artwork::ArtworkEngine;
+pub use engine::GameFindEngine;
 pub use error::{GameFindError, Result};
-pub use launcher::LauncherEngine;
-pub use models::{
+pub use model::{
     Game, LaunchTarget, Platform, PlatformPresence, PlatformStatus, ScanOptions, ScanReport,
     SearchOptions,
 };
 pub use music::{MusicApp, MusicAppCategory, MusicLaunchTarget, MusicScanReport, MusicScanner};
-pub use scanner::GameFindEngine;
-pub use sysinfo::{SysInfoReport, SysinfoEngine};
+pub use artwork::ArtworkEngine;
+

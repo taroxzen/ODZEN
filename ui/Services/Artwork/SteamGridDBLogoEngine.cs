@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // ODZEN — Cybernetic Gaming Platform
 // Developed by Taroxzen (https://github.com/taroxzen)
 // Copyright (c) 2026 Taroxzen. All rights reserved.
@@ -86,11 +86,25 @@ namespace Odzen.Avalonia.Services
             });
         }
 
+        public static string? CustomApiKey { get; set; }
+
         public static async Task<bool> DownloadTransparentLogoAsync(string gameId, string gameName, string platform, string? storeId)
         {
             string targetPath = GetLogoPath(gameId);
 
-            var urlsToTry = GenerateSteamGridDBUrls(gameName, platform, storeId, gameId);
+            var urlsToTry = new List<string>();
+
+            // If user provided a SteamGridDB API key, try official API first!
+            if (!string.IsNullOrWhiteSpace(CustomApiKey))
+            {
+                string? apiLogoUrl = await TryFetchLogoWithApiKeyAsync(gameName, platform, storeId, CustomApiKey.Trim());
+                if (!string.IsNullOrEmpty(apiLogoUrl))
+                {
+                    urlsToTry.Add(apiLogoUrl);
+                }
+            }
+
+            urlsToTry.AddRange(GenerateSteamGridDBUrls(gameName, platform, storeId, gameId));
 
             foreach (var url in urlsToTry)
             {
@@ -339,6 +353,60 @@ namespace Odzen.Avalonia.Services
                 return Convert.ToHexString(sha.ComputeHash(System.Text.Encoding.UTF8.GetBytes(name))).ToLowerInvariant();
             }
             return clean;
+        }
+
+        private static async Task<string?> TryFetchLogoWithApiKeyAsync(string gameName, string platform, string? storeId, string apiKey)
+        {
+            try
+            {
+                // 1. Steam game with AppId
+                if (platform.Equals("steam", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(storeId) && int.TryParse(storeId, out _))
+                {
+                    using var req = new HttpRequestMessage(HttpMethod.Get, $"https://www.steamgriddb.com/api/v2/logos/steam/{storeId}");
+                    req.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiKey);
+                    var resp = await _httpClient.SendAsync(req);
+                    if (resp.IsSuccessStatusCode)
+                    {
+                        string json = await resp.Content.ReadAsStringAsync();
+                        using var doc = System.Text.Json.JsonDocument.Parse(json);
+                        if (doc.RootElement.TryGetProperty("data", out var data) && data.GetArrayLength() > 0)
+                        {
+                            return data[0].TryGetProperty("url", out var u) ? u.GetString() : null;
+                        }
+                    }
+                }
+
+                // 2. Autocomplete search
+                using var searchReq = new HttpRequestMessage(HttpMethod.Get, $"https://www.steamgriddb.com/api/v2/search/autocomplete/{Uri.EscapeDataString(gameName)}");
+                searchReq.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiKey);
+                var searchResp = await _httpClient.SendAsync(searchReq);
+                if (searchResp.IsSuccessStatusCode)
+                {
+                    string searchJson = await searchResp.Content.ReadAsStringAsync();
+                    using var searchDoc = System.Text.Json.JsonDocument.Parse(searchJson);
+                    if (searchDoc.RootElement.TryGetProperty("data", out var sData) && sData.GetArrayLength() > 0)
+                    {
+                        int sgdbGameId = sData[0].TryGetProperty("id", out var idElem) ? idElem.GetInt32() : 0;
+                        if (sgdbGameId > 0)
+                        {
+                            using var logoReq = new HttpRequestMessage(HttpMethod.Get, $"https://www.steamgriddb.com/api/v2/logos/game/{sgdbGameId}");
+                            logoReq.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiKey);
+                            var logoResp = await _httpClient.SendAsync(logoReq);
+                            if (logoResp.IsSuccessStatusCode)
+                            {
+                                string logoJson = await logoResp.Content.ReadAsStringAsync();
+                                using var logoDoc = System.Text.Json.JsonDocument.Parse(logoJson);
+                                if (logoDoc.RootElement.TryGetProperty("data", out var lData) && lData.GetArrayLength() > 0)
+                                {
+                                    return lData[0].TryGetProperty("url", out var u) ? u.GetString() : null;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
+            return null;
         }
     }
 }

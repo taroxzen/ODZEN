@@ -772,11 +772,13 @@
                                 <!-- 4. Çevrimiçi Medya ve Logo Yapılandırması (Violet Purple Theme) -->
                                 <Border Width="450" MinWidth="340" Background="#1A122E" BorderBrush="#40A855F7" BorderThickness="1.5" CornerRadius="14" Padding="18" Margin="0,0,16,16" BoxShadow="0 4 16 #20000000, 0 0 10 #15A855F7">
                                     <StackPanel Spacing="12">
+                                        <!-- Başlık -->
                                         <StackPanel Orientation="Horizontal" Spacing="8">
                                             <PathIcon Data="{StaticResource IconGlobe}" Width="16" Height="16" Foreground="#A855F7" VerticalAlignment="Center" />
                                             <TextBlock Text="{Binding TxtOnlineMediaConfig}" FontSize="14" FontWeight="Bold" Foreground="#A855F7" VerticalAlignment="Center" />
                                         </StackPanel>
 
+                                        <!-- 1. İnternetten Orijinal Logoları İndir Ana Aç/Kapa -->
                                         <Grid ColumnDefinitions="*, Auto">
                                             <StackPanel Grid.Column="0">
                                                 <TextBlock Text="{Binding TxtDownloadOnlineLogos}" FontWeight="SemiBold" Foreground="#F8FAFC" TextWrapping="Wrap" />
@@ -785,18 +787,65 @@
                                             <CheckBox Grid.Column="1" IsChecked="{Binding FetchLogosFromInternet, Mode=TwoWay}" Margin="8,0,0,0" />
                                         </Grid>
 
-                                        <Grid ColumnDefinitions="*, Auto">
-                                            <StackPanel Grid.Column="0">
-                                                <TextBlock Text="{Binding TxtRefreshAllLogos}" FontWeight="SemiBold" Foreground="#F8FAFC" TextWrapping="Wrap" />
-                                                <TextBlock Text="{Binding TxtRefreshAllLogosDesc}" FontSize="11" Foreground="#94A3B8" TextWrapping="Wrap" />
+                                        <!-- 5. Aktif Arama Kaynakları (Seçim Kutuları) -->
+                                        <Border Background="#120A24" CornerRadius="8" Padding="10,8" BorderBrush="#25FFFFFF" BorderThickness="1">
+                                            <StackPanel Spacing="6">
+                                                <TextBlock Text="{Binding TxtSourcesTitle}" FontSize="11" FontWeight="Bold" Foreground="#C084FC" />
+                                                <Grid ColumnDefinitions="*, *, *">
+                                                    <CheckBox Grid.Column="0" IsChecked="{Binding UseSteamSource, Mode=TwoWay}" Content="Steam" FontSize="11" Foreground="#E2E8F0" Margin="0,0,4,0" />
+                                                    <CheckBox Grid.Column="1" IsChecked="{Binding UseWikimediaSource, Mode=TwoWay}" Content="Wikimedia" FontSize="11" Foreground="#E2E8F0" Margin="2,0" />
+                                                    <CheckBox Grid.Column="2" IsChecked="{Binding UseSteamGridDbSource, Mode=TwoWay}" Content="SteamGridDB" FontSize="11" Foreground="#E2E8F0" Margin="4,0,0,0" />
+                                                </Grid>
                                             </StackPanel>
-                                            <Button Grid.Column="1" Classes="neon-primary" Command="{Binding RefreshOnlineLogosCommand}" Padding="14,6" Margin="8,0,0,0">
-                                                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                                                    <PathIcon Data="{StaticResource IconSync}" Width="13" Height="13" Foreground="#00162B" VerticalAlignment="Center" />
-                                                    <TextBlock Text="{Binding TxtRefreshLogosBtn}" FontSize="12" FontWeight="Bold" Foreground="#00162B" VerticalAlignment="Center" />
+                                        </Border>
+
+                                        <!-- 4. SteamGridDB API Anahtarı (İsteğe Bağlı) -->
+                                        <TextBox Text="{Binding SteamGridDbApiKey, Mode=TwoWay}" 
+                                                 Watermark="{Binding TxtSteamGridDbKeyPlaceholder}" 
+                                                 Background="#120A24" Foreground="#F8FAFC" BorderBrush="#35A855F7" BorderThickness="1" 
+                                                 CornerRadius="8" FontSize="11" Padding="10,6" />
+
+                                        <!-- 2 & 3. Hızlı Eylem Butonları (Tümünü Yenile, Yalnızca Eksikler, Klasör Aç, Önbellek Temizle) -->
+                                        <Grid ColumnDefinitions="*, *" RowDefinitions="Auto, Auto" Margin="0,2,0,0">
+                                            <!-- Satır 0: Tümünü Yenile & Yalnızca Eksikleri İndir -->
+                                            <Button Grid.Row="0" Grid.Column="0" Classes="neon-primary" Command="{Binding RefreshOnlineLogosCommand}" Margin="0,0,4,6" Height="34" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+                                                <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                    <PathIcon Data="{StaticResource IconSync}" Width="12" Height="12" Foreground="#00162B" VerticalAlignment="Center" />
+                                                    <TextBlock Text="{Binding TxtRefreshLogosBtn}" FontSize="11" FontWeight="Bold" Foreground="#00162B" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </Button>
+                                            <Button Grid.Row="0" Grid.Column="1" Classes="glass-btn" Command="{Binding DownloadMissingLogosCommand}" Margin="4,0,0,6" Height="34" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+                                                <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                    <PathIcon Data="{StaticResource IconBolt}" Width="12" Height="12" Foreground="#38BDF8" VerticalAlignment="Center" />
+                                                    <TextBlock Text="{Binding TxtDownloadMissingLogos}" FontSize="11" FontWeight="Bold" Foreground="#F8FAFC" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </Button>
+
+                                            <!-- Satır 1: Klasörü Aç & Önbelleği Temizle (Boyut Göstergeli) -->
+                                            <Button Grid.Row="1" Grid.Column="0" Classes="glass-btn" Command="{Binding OpenLogoFolderCommand}" Margin="0,0,4,0" Height="34" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+                                                <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                    <PathIcon Data="{StaticResource IconFolder}" Width="12" Height="12" Foreground="#FBBF24" VerticalAlignment="Center" />
+                                                    <TextBlock Text="{Binding TxtOpenLogoFolder}" FontSize="11" FontWeight="SemiBold" Foreground="#F8FAFC" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </Button>
+                                            <Button Grid.Row="1" Grid.Column="1" Classes="glass-btn" Command="{Binding ClearLogoCacheCommand}" Margin="4,0,0,0" Height="34" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+                                                <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                    <PathIcon Data="{StaticResource IconTrash}" Width="12" Height="12" Foreground="#F87171" VerticalAlignment="Center" />
+                                                    <TextBlock Text="{Binding ClearCacheButtonText}" FontSize="11" FontWeight="SemiBold" Foreground="#F87171" VerticalAlignment="Center" />
                                                 </StackPanel>
                                             </Button>
                                         </Grid>
+
+                                        <!-- 6. Canlı İndirme İlerleme Çubuğu ve Durumu (Yalnızca indirme sırasında görünür) -->
+                                        <Border IsVisible="{Binding IsLogoDownloading}" Background="#120A24" CornerRadius="8" Padding="10,8" BorderBrush="#60A855F7" BorderThickness="1">
+                                            <StackPanel Spacing="6">
+                                                <Grid ColumnDefinitions="*, Auto">
+                                                    <TextBlock Grid.Column="0" Text="{Binding LogoDownloadStatusText}" FontSize="11" Foreground="#C084FC" TextTrimming="CharacterEllipsis" />
+                                                    <TextBlock Grid.Column="1" Text="{Binding LogoDownloadPercentText}" FontSize="11" FontWeight="Bold" Foreground="#38BDF8" Margin="6,0,0,0" />
+                                                </Grid>
+                                                <ProgressBar Minimum="0" Maximum="100" Value="{Binding LogoDownloadProgress}" Height="5" CornerRadius="3" Foreground="#A855F7" Background="#2E1065" />
+                                            </StackPanel>
+                                        </Border>
                                     </StackPanel>
                                 </Border>
 
@@ -1009,6 +1058,12 @@
                                                     <StackPanel Grid.Column="0" Spacing="4">
                                                         <TextBlock Text="{Binding TxtGameTitle}" FontSize="10" FontWeight="Bold" Foreground="#64748B" />
                                                         <TextBox Text="{Binding SelectedGame.Name, Mode=TwoWay}" FontSize="16" FontWeight="Bold" Background="#111A2E" BorderBrush="#25FFFFFF" Foreground="#F8FAFC" Padding="10,6" CornerRadius="8" />
+                                                        
+                                                        <!-- Dual-Verification: Publisher / Developer Info from PE Metadata -->
+                                                        <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,4,0,0" IsVisible="{Binding SelectedGame.Publisher, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                                            <TextBlock Text="Üretici / Yayıncı:" FontSize="11" Foreground="#64748B" FontWeight="Bold" />
+                                                            <TextBlock Text="{Binding SelectedGame.Publisher}" FontSize="11" Foreground="#38BDF8" FontWeight="SemiBold" />
+                                                        </StackPanel>
                                                     </StackPanel>
                                                     <Button Grid.Column="1" Command="{Binding ToggleFavoriteCommand}" CommandParameter="{Binding SelectedGame}" Classes="glass-btn" Margin="12,18,0,0" Padding="14,8">
                                                         <StackPanel Orientation="Horizontal" Spacing="6">
@@ -1020,14 +1075,22 @@
 
                                                 <!-- 2. Logo & Media Customization Controls -->
                                                 <Border Background="#111A2E" BorderBrush="#15FFFFFF" BorderThickness="1" CornerRadius="10" Padding="14">
-                                                    <Grid ColumnDefinitions="*, Auto, Auto, Auto" VerticalAlignment="Center">
+                                                    <Grid ColumnDefinitions="*, Auto, Auto, Auto, Auto" VerticalAlignment="Center">
                                                         <StackPanel Grid.Column="0" Spacing="2">
                                                             <TextBlock Text="{Binding TxtCustomLogoMedia}" FontWeight="Bold" Foreground="#00F0FF" FontSize="12" />
                                                             <TextBlock Text="{Binding SelectedGame.CustomLogoPath, TargetNullValue='Otomatik Aktif'}" FontSize="11" Foreground="#64748B" TextTrimming="CharacterEllipsis" />
                                                         </StackPanel>
                                                         
-                                                        <!-- Pick Custom Logo -->
-                                                        <Button Grid.Column="1" Classes="glass-btn" Command="{Binding PickCustomLogoCommand}" Margin="6,0" Padding="10,6" ToolTip.Tip="Bilgisayardan Özel PNG/ICO Logo Seç">
+                                                        <!-- Search & Pick Online Logo (NEW!) -->
+                                                        <Button Grid.Column="1" Classes="glass-btn" Command="{Binding OpenLogoPickerCommand}" Margin="4,0" Padding="10,6" ToolTip.Tip="Çevrimiçi Logo Ara, Adayları Gör ve Seç">
+                                                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                                                <PathIcon Data="{StaticResource IconSearch}" Width="12" Height="12" Foreground="#38BDF8" VerticalAlignment="Center" />
+                                                                <TextBlock Text="{Binding TxtSearchAndPickLogo}" FontSize="11" Foreground="#38BDF8" FontWeight="Bold" VerticalAlignment="Center" />
+                                                            </StackPanel>
+                                                        </Button>
+
+                                                        <!-- Pick Custom Logo (Local) -->
+                                                        <Button Grid.Column="2" Classes="glass-btn" Command="{Binding PickCustomLogoCommand}" Margin="4,0" Padding="10,6" ToolTip.Tip="Bilgisayardan Özel PNG/ICO Logo Seç">
                                                             <StackPanel Orientation="Horizontal" Spacing="5">
                                                                 <PathIcon Data="{StaticResource IconImage}" Width="13" Height="13" Foreground="#00F0FF" VerticalAlignment="Center" />
                                                                 <TextBlock Text="{Binding TxtChangeLogo}" FontSize="11" FontWeight="Bold" VerticalAlignment="Center" />
@@ -1035,15 +1098,15 @@
                                                         </Button>
 
                                                         <!-- Revert to System Local Logo -->
-                                                        <Button Grid.Column="2" Classes="glass-btn" Command="{Binding ClearCustomLogoCommand}" Margin="0,0,6,0" Padding="10,6" ToolTip.Tip="Bilgisayardaki Orijinal Sistem (.exe/Yerel) Logosuna Dön">
+                                                        <Button Grid.Column="3" Classes="glass-btn" Command="{Binding ClearCustomLogoCommand}" Margin="4,0" Padding="10,6" ToolTip.Tip="Bilgisayardaki Orijinal Sistem (.exe/Yerel) Logosuna Dön">
                                                             <StackPanel Orientation="Horizontal" Spacing="5">
                                                                 <PathIcon Data="{StaticResource IconFolder}" Width="12" Height="12" Foreground="#B4FF00" VerticalAlignment="Center" />
                                                                 <TextBlock Text="{Binding TxtSystemLogo}" FontSize="11" Foreground="#B4FF00" VerticalAlignment="Center" />
                                                             </StackPanel>
                                                         </Button>
 
-                                                        <!-- Use Cloud/Online Logo -->
-                                                        <Button Grid.Column="3" Classes="glass-btn" Command="{Binding UseOnlineLogoCommand}" Padding="10,6" ToolTip.Tip="Steam Store ve Çevrimiçi Açık HD/4K Logoyu Kullan">
+                                                        <!-- Direct Auto-Online Logo -->
+                                                        <Button Grid.Column="4" Classes="glass-btn" Command="{Binding UseOnlineLogoCommand}" Padding="10,6" ToolTip.Tip="Steam Store ve Çevrimiçi Açık HD/4K Logoyu Otomatik Çek">
                                                             <StackPanel Orientation="Horizontal" Spacing="5">
                                                                 <PathIcon Data="{StaticResource IconGlobe}" Width="12" Height="12" Foreground="#00F0FF" VerticalAlignment="Center" />
                                                                 <TextBlock Text="{Binding TxtOnlineLogo}" FontSize="11" Foreground="#00F0FF" VerticalAlignment="Center" />
@@ -1235,6 +1298,117 @@
                                             </ScrollViewer>
                                         </Grid>
                                     </Grid>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <!-- ================= INTERACTIVE ONLINE LOGO SEARCH & CANDIDATE PICKER MODAL ================= -->
+                    <Border IsVisible="{Binding IsLogoPickerOpen}" Background="#E6050B14" ZIndex="250" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Width="740" MaxHeight="560">
+                            <Border Background="#0C1322" BorderBrush="#25FFFFFF" BorderThickness="1" CornerRadius="16" ClipToBounds="True" BoxShadow="0 24 64 #90000000">
+                                <Grid RowDefinitions="Auto, Auto, *, Auto">
+                                    
+                                    <!-- Modal Header -->
+                                    <Border Grid.Row="0" Background="#10182C" CornerRadius="15,15,0,0" Padding="20,16" BorderBrush="#20FFFFFF" BorderThickness="0,0,0,1">
+                                        <Grid ColumnDefinitions="*, Auto">
+                                            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                                <PathIcon Data="{StaticResource IconSearch}" Width="16" Height="16" Foreground="#38BDF8" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding TxtLogoPickerTitle}" FontSize="15" FontWeight="ExtraBold" Foreground="#F8FAFC" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                            <Button Grid.Column="1" Classes="glass-btn" Command="{Binding CloseLogoPickerCommand}" Width="32" Height="32" Padding="0">
+                                                <TextBlock Text="✕" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#94A3B8" />
+                                            </Button>
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- Search Controls & Direct URL Row -->
+                                    <Border Grid.Row="1" Background="#0E1626" Padding="18,14" BorderBrush="#15FFFFFF" BorderThickness="0,0,0,1">
+                                        <StackPanel Spacing="10">
+                                            <!-- Query Search Bar -->
+                                            <Grid ColumnDefinitions="*, 8, Auto">
+                                                <TextBox Grid.Column="0" Text="{Binding LogoPickerSearchQuery, Mode=TwoWay}" Watermark="Oyun adı veya anahtar kelime yazın..." FontSize="13" Background="#141E34" BorderBrush="#25FFFFFF" Foreground="#F8FAFC" Padding="12,8" CornerRadius="8" />
+                                                <Button Grid.Column="2" Classes="neon-primary" Command="{Binding SearchLogoCandidatesCommand}" Padding="16,8" Height="36">
+                                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                                        <PathIcon Data="{StaticResource IconSearch}" Width="12" Height="12" Foreground="#00162B" VerticalAlignment="Center" />
+                                                        <TextBlock Text="Ara" FontWeight="Bold" FontSize="12" Foreground="#00162B" VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                </Button>
+                                            </Grid>
+
+                                            <!-- Direct Image URL Paste Bar -->
+                                            <Grid ColumnDefinitions="*, 8, Auto">
+                                                <TextBox Grid.Column="0" Text="{Binding LogoPickerCustomUrl, Mode=TwoWay}" Watermark="Veya doğrudan görsel URL'si yapıştırın (https://...png/svg)..." FontSize="11" Background="#141E34" BorderBrush="#25FFFFFF" Foreground="#94A3B8" Padding="10,6" CornerRadius="8" />
+                                                <Button Grid.Column="2" Classes="glass-btn" Command="{Binding ApplyCustomLogoUrlCommand}" Padding="12,6" Height="32">
+                                                    <StackPanel Orientation="Horizontal" Spacing="5">
+                                                        <PathIcon Data="{StaticResource IconSave}" Width="11" Height="11" Foreground="#00F0FF" VerticalAlignment="Center" />
+                                                        <TextBlock Text="{Binding TxtApplyUrl}" FontSize="11" Foreground="#00F0FF" FontWeight="Bold" VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                </Button>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- Candidates Results Grid / Loading / Empty -->
+                                    <Grid Grid.Row="2" MinHeight="260" MaxHeight="340">
+                                        <!-- Loading Indicator -->
+                                        <StackPanel IsVisible="{Binding IsLogoPickerLoading}" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10">
+                                            <ProgressBar IsIndeterminate="True" Width="200" Height="4" Foreground="#38BDF8" Background="#15FFFFFF" />
+                                            <TextBlock Text="Çevrimiçi kaynaklar (Steam, SteamGridDB, Wikimedia) taranıyor..." FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center" />
+                                        </StackPanel>
+
+                                        <!-- Empty State -->
+                                        <StackPanel IsVisible="{Binding !IsLogoPickerLoading}" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8" Margin="20">
+                                            <TextBlock Text="{Binding TxtNoCandidates}" FontSize="12" Foreground="#64748B" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="440" IsVisible="{Binding !LogoCandidates.Count}" />
+                                        </StackPanel>
+
+                                        <!-- Candidates List -->
+                                        <ScrollViewer IsVisible="{Binding !IsLogoPickerLoading}" VerticalScrollBarVisibility="Auto" Margin="12,10">
+                                            <ItemsControl ItemsSource="{Binding LogoCandidates}">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center" />
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Button Classes="glass-btn" Command="{Binding $parent[Window].((vm:MainViewModel)DataContext).SelectLogoCandidateCommand}" CommandParameter="{Binding}" Margin="6" Padding="0" Width="210" Height="125" CornerRadius="10" BorderBrush="#25FFFFFF" Background="#111A2E">
+                                                            <Grid RowDefinitions="*, Auto">
+                                                                <!-- Candidate Image Preview -->
+                                                                <Border Grid.Row="0" Margin="6" Background="#060B14" CornerRadius="6" ClipToBounds="True">
+                                                                    <Panel>
+                                                                        <Image Source="{Binding ThumbnailBitmap}" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding HasBitmap}" />
+                                                                        <PathIcon Data="{StaticResource IconImage}" Width="24" Height="24" Foreground="#38BDF8" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding !HasBitmap}" />
+                                                                    </Panel>
+                                                                </Border>
+                                                                
+                                                                <!-- Candidate Source & Title -->
+                                                                <Border Grid.Row="1" Background="#0B1324" Padding="8,5" BorderBrush="#15FFFFFF" BorderThickness="0,1,0,0">
+                                                                    <Grid ColumnDefinitions="Auto, *">
+                                                                        <Border Grid.Column="0" Background="#1A2744" CornerRadius="4" Padding="4,1" Margin="0,0,6,0">
+                                                                            <TextBlock Text="{Binding Source}" FontSize="9" FontWeight="Bold" Foreground="#38BDF8" />
+                                                                        </Border>
+                                                                        <TextBlock Grid.Column="1" Text="{Binding Title}" FontSize="10" Foreground="#F8FAFC" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                                                                    </Grid>
+                                                                </Border>
+                                                            </Grid>
+                                                        </Button>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </ScrollViewer>
+                                    </Grid>
+
+                                    <!-- Footer -->
+                                    <Border Grid.Row="3" Background="#0C1322" Padding="16,12" BorderBrush="#15FFFFFF" BorderThickness="0,1,0,0">
+                                        <Grid ColumnDefinitions="*, Auto">
+                                            <TextBlock Grid.Column="0" Text="İpucu: Beğendiğiniz logoya tıklayarak anında oyun kartına uygulayabilirsiniz." FontSize="11" Foreground="#64748B" VerticalAlignment="Center" />
+                                            <Button Grid.Column="1" Classes="glass-btn" Command="{Binding CloseLogoPickerCommand}" Padding="14,6">
+                                                <TextBlock Text="Kapat" FontSize="11" Foreground="#94A3B8" />
+                                            </Button>
+                                        </Grid>
+                                    </Border>
+
                                 </Grid>
                             </Border>
                         </Grid>

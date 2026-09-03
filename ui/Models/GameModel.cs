@@ -119,6 +119,14 @@ namespace Odzen.Avalonia.Models
         [JsonPropertyName("quick_launch_command")]
         public string? QuickLaunchCommand { get; set; }
 
+        private string? _publisher;
+        [JsonPropertyName("publisher")]
+        public string? Publisher
+        {
+            get => _publisher;
+            set => SetProperty(ref _publisher, value);
+        }
+
         [JsonIgnore]
         public global::Avalonia.Media.Imaging.Bitmap? GameIcon
         {

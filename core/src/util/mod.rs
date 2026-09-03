@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // ONYX Launcher — Game Scanner Engine (Rust Core)
 // Developed by Taroxzen (https://github.com/taroxzen)
 // Copyright (c) 2026 Taroxzen. All rights reserved.
@@ -13,7 +13,7 @@ pub mod registry;
 use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
 
-/// Pick a reasonable main `.exe` under `dir` (largest non-helper binary).
+/// Pick the authentic main `.exe` under `dir` (highest score, filtering out helper/redist binaries).
 pub fn find_main_exe(dir: &Path) -> Option<PathBuf> {
     if !dir.is_dir() {
         return None;
@@ -23,24 +23,52 @@ pub fn find_main_exe(dir: &Path) -> Option<PathBuf> {
         "unitycrashhandler",
         "crashpad",
         "crashreporter",
+        "crashhandler",
         "uninstall",
         "unins",
         "redist",
         "vcredist",
         "dxsetup",
+        "dxwebsetup",
+        "quicksfv",
+        "yamakaldır",
+        "yamakaldir",
         "dotnet",
         "easyanticheat",
         "battleye",
-        "launcher",
         "cefsharp",
         "notification_helper",
-        "crashhandler",
+        "report",
+        "patcher",
+        "setup",
+        "installer",
+        "helper",
+        "config",
+        "autoupdate",
     ];
 
-    let mut best: Option<(u64, PathBuf)> = None;
+    let skip_dir_parts = [
+        "_redist",
+        "\\redist",
+        "/redist",
+        "directx",
+        "support",
+        "prerequisites",
+        "installer",
+        "dependencies",
+        "$recycle.bin",
+    ];
+
+    let dir_name = dir
+        .file_name()
+        .and_then(|s| s.to_str())
+        .unwrap_or("")
+        .to_ascii_lowercase();
+
+    let mut best: Option<(i64, PathBuf)> = None;
 
     for entry in WalkDir::new(dir)
-        .max_depth(3)
+        .max_depth(5)
         .into_iter()
         .filter_map(|e| e.ok())
     {
@@ -49,18 +77,45 @@ pub fn find_main_exe(dir: &Path) -> Option<PathBuf> {
         {
             continue;
         }
-        let name = path
+
+        let path_str = path.to_string_lossy().to_ascii_lowercase();
+        if skip_dir_parts.iter().any(|d| path_str.contains(d)) {
+            continue;
+        }
+
+        let stem = path
             .file_stem()
             .and_then(|s| s.to_str())
             .unwrap_or("")
             .to_ascii_lowercase();
-        if skip_names.iter().any(|s| name.contains(s)) {
+
+        if skip_names.iter().any(|s| stem.contains(s)) {
             continue;
         }
+
         let size = entry.metadata().map(|m| m.len()).unwrap_or(0);
+        if size < 50_000 {
+            continue;
+        }
+
+        let mut score = size as i64;
+
+        // Unreal Engine / Modern Shipping 64-bit Game Binary Priority
+        if stem.ends_with("-win64-shipping") || stem.ends_with("_shipping") || stem.ends_with("shipping") {
+            score += 150_000_000;
+        }
+        // Direct match with directory title
+        if !dir_name.is_empty() && stem == dir_name {
+            score += 100_000_000;
+        }
+        // Preferred subdirectories
+        if path_str.contains("binaries\\win64") || path_str.contains("binaries/win64") {
+            score += 50_000_000;
+        }
+
         match &best {
-            None => best = Some((size, path.to_path_buf())),
-            Some((bs, _)) if size > *bs => best = Some((size, path.to_path_buf())),
+            None => best = Some((score, path.to_path_buf())),
+            Some((bs, _)) if score > *bs => best = Some((score, path.to_path_buf())),
             _ => {}
         }
     }

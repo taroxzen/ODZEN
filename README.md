@@ -1,4 +1,4 @@
-# 🌌 ODZEN — Cybernetic Gaming Platform (v1.3.0)
+# 🌌 ODZEN — Cybernetic Gaming Platform (v1.4.2)
 
 <p align="center">
   <img src="assets/odzen_logo.svg" alt="ODZEN Logo" width="128" height="128" />
@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.3.0-blue.svg" alt="Version 1.3.0" />
+  <img src="https://img.shields.io/badge/version-1.4.2-blue.svg" alt="Version 1.4.2" />
   <img src="https://img.shields.io/badge/Rust-2024_Edition-orange.svg" alt="Rust 2024" />
   <img src="https://img.shields.io/badge/.NET-10.0-purple.svg" alt=".NET 10" />
   <img src="https://img.shields.io/badge/UI-Avalonia_11.2-blueviolet.svg" alt="Avalonia UI" />
@@ -22,8 +22,9 @@
 ## 🌟 Key Features
 
 - 🦀 **Unified Rust Core (`odzen-core`):** Blazing fast disk & platform scanner powered by multi-threaded Rayon parallelism with zero runtime external dependencies.
-- 🎨 **4K Transparent Logo Pipeline:** SIMD-accelerated transparent canvas cropper, automatic multi-tier CDN resolver (Steam, SteamGridDB, Curated Database).
-- 🎮 **13+ Game Platforms Supported:** Native discovery for Steam, Epic Games, Xbox / Microsoft Store, EA App, Riot Games, Ubisoft Connect, GOG Galaxy, Battle.net, Rockstar Games Launcher, Minecraft (Vanilla, Bedrock, CurseForge, Prism), Metin2 (Official & P-Servers), and custom local executables.
+- 🧠 **Dual-Verification Scanner & Manufacturer Detection:** Engine asset scanning (Unreal, Unity, Source) + PE executable metadata inspection (`CompanyName`, `ProductName`). Distinguishes true shipping game binaries from DirectX setups and uninstallers.
+- 🎨 **4K Transparent Logo Pipeline & Interactive Picker:** SIMD-accelerated transparent canvas cropper, dark-theme contrast adapter, automatic multi-tier CDN resolver, and live candidate picker popup in Game Detail.
+- 🎮 **13+ Game Platforms Supported:** Native discovery for Steam, Epic Games (direct protocol launch), Xbox / Microsoft Store, EA App, Riot Games, Ubisoft Connect, GOG Galaxy, Battle.net, Rockstar Games Launcher, Minecraft (Vanilla, Bedrock, CurseForge, Prism), Metin2 (Official & P-Servers), and custom local executables.
 - 🎵 **Integrated Music & Media Hub:** Instant access to Spotify, YouTube Music, Apple Music, Tidal, and Deezer with user visibility toggles.
 - 🌍 **8-Language Localization:** Built-in dynamic translation for English, Turkish, German, Bulgarian, Spanish, Dutch, French, and Russian.
 - 🖥️ **GPU-Accelerated Glassmorphic UI:** Smooth, dark-themed responsive interface with configurable UI scaling (80% to 140%).

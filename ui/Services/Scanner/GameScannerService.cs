@@ -31,21 +31,14 @@ namespace Odzen.Avalonia.Services
         public static string? FindScannerExe()
         {
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            string localAppDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ODZEN", "engine");
+
             string[] candidates = {
-                Path.Combine(baseDir, "core", "odzen-core.exe"),
-                Path.Combine(baseDir, "core", "bin", "odzen-core.exe"),
-                Path.Combine(baseDir, "engine", "odzen-core.exe"),
                 Path.Combine(baseDir, "odzen-core.exe"),
-                Path.Combine(baseDir, "engine", "scanner", "odzen-game-scanner.exe"),
-                Path.Combine(baseDir, "tools", "scanner", "odzen-game-scanner.exe"),
-                Path.Combine(baseDir, "odzen-game-scanner.exe"),
+                Path.Combine(baseDir, "core", "odzen-core.exe"),
+                Path.Combine(localAppDir, "odzen-core.exe"),
                 Path.Combine(baseDir, "..", "core", "odzen-core.exe"),
-                Path.Combine(baseDir, "..", "core", "bin", "odzen-core.exe"),
-                Path.Combine(baseDir, "..", "engine", "odzen-core.exe"),
-                Path.Combine(baseDir, "..", "odzen-core.exe"),
                 Path.Combine(baseDir, "..", "..", "core", "odzen-core.exe"),
-                Path.Combine(baseDir, "..", "..", "odzen-game-scanner", "target", "release", "odzen-core.exe"),
-                Path.Combine(baseDir, "..", "..", "..", "odzen-game-scanner", "target", "release", "odzen-core.exe"),
             };
 
             foreach (var c in candidates)
@@ -57,6 +50,58 @@ namespace Odzen.Avalonia.Services
                 }
                 catch { }
             }
+
+            // AUTO-EXTRACT EMBEDDED ENGINE (True All-in-One Portable Mode)
+            return ExtractEmbeddedEngine();
+        }
+
+        private static string? ExtractEmbeddedEngine()
+        {
+            try
+            {
+                string targetDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ODZEN", "engine");
+                Directory.CreateDirectory(targetDir);
+                string targetPath = Path.Combine(targetDir, "odzen-core.exe");
+
+                var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                string[] possibleNames = {
+                    "Odzen.Avalonia.Assets.odzen-core.exe",
+                    "Odzen.Avalonia.odzen-core.exe",
+                    "odzen-core.exe"
+                };
+
+                Stream? stream = null;
+                foreach (var name in possibleNames)
+                {
+                    stream = assembly.GetManifestResourceStream(name);
+                    if (stream != null) break;
+                }
+
+                if (stream == null)
+                {
+                    var resName = assembly.GetManifestResourceNames().FirstOrDefault(n => n.EndsWith("odzen-core.exe", StringComparison.OrdinalIgnoreCase));
+                    if (!string.IsNullOrEmpty(resName))
+                    {
+                        stream = assembly.GetManifestResourceStream(resName);
+                    }
+                }
+
+                if (stream != null)
+                {
+                    using (stream)
+                    {
+                        if (File.Exists(targetPath) && new FileInfo(targetPath).Length == stream.Length)
+                        {
+                            return targetPath;
+                        }
+
+                        using var fs = new FileStream(targetPath, FileMode.Create, FileAccess.Write, FileShare.Read);
+                        stream.CopyTo(fs);
+                    }
+                    return targetPath;
+                }
+            }
+            catch { }
             return null;
         }
 
@@ -122,6 +167,7 @@ namespace Odzen.Avalonia.Services
                                         }
                                     }
 
+                                    EnrichGameWithDualVerification(item);
                                     scanned.Add(item);
                                 }
                             }
@@ -131,10 +177,192 @@ namespace Odzen.Avalonia.Services
                 catch { }
             }
 
+            // Dual-Verification: Deduplicate multiple game entries in the same install folder
+            scanned = DeduplicateGamesByInstallPath(scanned);
+
             LoadOfflineData(scanned);
+            foreach (var g in scanned)
+            {
+                EnrichGameWithDualVerification(g);
+            }
+
             SaveOfflineData(scanned, LoadCustomGames(), LoadRecentGameIds());
 
             return scanned;
+        }
+
+        /// <summary>
+        /// Level 2 Dual Verification: PE FileVersionInfo & Manufacturer / Publisher Cross-Check
+        /// </summary>
+        public static void EnrichGameWithDualVerification(GameItem item)
+        {
+            if (item == null) return;
+
+            // 1. If executable is missing or invalid or points to redist/uninstaller, find the authentic one
+            if (string.IsNullOrEmpty(item.Executable) || !File.Exists(item.Executable) || IsRedistOrUninstaller(item.Executable))
+            {
+                if (!string.IsNullOrEmpty(item.InstallPath) && Directory.Exists(item.InstallPath))
+                {
+                    string? bestExe = FindBestGameExecutable(item.InstallPath);
+                    if (!string.IsNullOrEmpty(bestExe))
+                    {
+                        item.Executable = bestExe;
+                        if (item.Launch != null)
+                        {
+                            item.Launch.Path = bestExe;
+                        }
+                    }
+                }
+            }
+
+            // 2. Extract PE FileVersionInfo (Company, Product, Description)
+            if (!string.IsNullOrEmpty(item.Executable) && File.Exists(item.Executable))
+            {
+                try
+                {
+                    var vi = FileVersionInfo.GetVersionInfo(item.Executable);
+                    
+                    // Publisher / Manufacturer
+                    if (!string.IsNullOrWhiteSpace(vi.CompanyName))
+                    {
+                        string company = vi.CompanyName.Trim();
+                        if (!IsGenericCompany(company))
+                        {
+                            item.Publisher = company;
+                        }
+                    }
+
+                    // Refine short titles (like S2 or generic titles)
+                    if (item.Name.Equals("S2", StringComparison.OrdinalIgnoreCase) && item.Publisher?.Contains("CJ", StringComparison.OrdinalIgnoreCase) == true)
+                    {
+                        item.Publisher = "CJGameLab (S2 Son Silah)";
+                    }
+                }
+                catch { }
+            }
+        }
+
+        private static bool IsGenericCompany(string company)
+        {
+            string lower = company.ToLowerInvariant();
+            return lower.Contains("microsoft") || lower.Contains("directx") || lower.Contains("install") ||
+                   lower.Contains("inno setup") || lower.Contains("nullsoft") || lower.Contains("taroxzen");
+        }
+
+        private static bool IsRedistOrUninstaller(string exePath)
+        {
+            string lower = exePath.ToLowerInvariant();
+            return lower.Contains(@"\_redist\") || lower.Contains(@"\redist\") || lower.Contains("dxwebsetup") ||
+                   lower.Contains("unins000") || lower.Contains("uninstall") || lower.Contains("yamakaldır") ||
+                   lower.Contains("yamakaldir") || lower.Contains("quicksfv");
+        }
+
+        /// <summary>
+        /// Level 1 Dual Verification: Heuristic Game Assets & Engine Binary Selection (Depth 5)
+        /// </summary>
+        public static string? FindBestGameExecutable(string dir)
+        {
+            if (!Directory.Exists(dir)) return null;
+
+            string[] skipNames = {
+                "unitycrashhandler", "crashpad", "crashreporter", "crashhandler",
+                "uninstall", "unins", "redist", "vcredist", "dxsetup", "dxwebsetup",
+                "quicksfv", "yamakaldır", "yamakaldir", "dotnet", "easyanticheat",
+                "battleye", "cefsharp", "notification_helper", "report", "patcher",
+                "setup", "installer", "helper", "config", "autoupdate"
+            };
+
+            string[] skipDirParts = {
+                "_redist", "\\redist", "/redist", "directx", "support", "prerequisites",
+                "installer", "dependencies", "$recycle.bin"
+            };
+
+            string dirName = Path.GetFileName(dir.TrimEnd('\\', '/')).ToLowerInvariant();
+            string? bestPath = null;
+            long bestScore = -1;
+
+            try
+            {
+                var opt = new EnumerationOptions
+                {
+                    RecurseSubdirectories = true,
+                    MaxRecursionDepth = 5,
+                    IgnoreInaccessible = true
+                };
+
+                foreach (var file in Directory.EnumerateFiles(dir, "*.exe", opt))
+                {
+                    string fileLower = file.ToLowerInvariant();
+                    if (skipDirParts.Any(d => fileLower.Contains(d))) continue;
+
+                    string stem = Path.GetFileNameWithoutExtension(file).ToLowerInvariant();
+                    if (skipNames.Any(s => stem.Contains(s))) continue;
+
+                    var fi = new FileInfo(file);
+                    if (fi.Length < 50_000) continue; // Skip tiny batch wrappers
+
+                    long score = fi.Length;
+
+                    // Shipping Game Binary Priority
+                    if (stem.EndsWith("-win64-shipping") || stem.EndsWith("_shipping") || stem.EndsWith("shipping"))
+                    {
+                        score += 150_000_000;
+                    }
+
+                    // Direct match with directory title
+                    if (!string.IsNullOrEmpty(dirName) && stem == dirName)
+                    {
+                        score += 100_000_000;
+                    }
+
+                    // Binaries\Win64 location
+                    if (fileLower.Contains(@"binaries\win64") || fileLower.Contains("binaries/win64"))
+                    {
+                        score += 50_000_000;
+                    }
+
+                    if (score > bestScore)
+                    {
+                        bestScore = score;
+                        bestPath = file;
+                    }
+                }
+            }
+            catch { }
+
+            return bestPath;
+        }
+
+        /// <summary>
+        /// Deduplicates game items sharing the same installation directory root
+        /// </summary>
+        public static List<GameItem> DeduplicateGamesByInstallPath(List<GameItem> games)
+        {
+            if (games == null || games.Count == 0) return new List<GameItem>();
+
+            var result = new List<GameItem>();
+            var seenPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var game in games)
+            {
+                if (string.IsNullOrEmpty(game.InstallPath))
+                {
+                    result.Add(game);
+                    continue;
+                }
+
+                string normPath = Path.GetFullPath(game.InstallPath).TrimEnd('\\', '/').ToLowerInvariant();
+
+                if (seenPaths.Contains(normPath))
+                {
+                    continue;
+                }
+
+                seenPaths.Add(normPath);
+                result.Add(game);
+            }
+
+            return result;
         }
 
         private static string GetPrettyPlatformName(string platform) => platform.ToLowerInvariant() switch
@@ -174,6 +402,24 @@ namespace Odzen.Avalonia.Services
                     catch (Exception qEx)
                     {
                         Debug.WriteLine($"Quick launch fallback: {qEx.Message}");
+                    }
+                }
+
+                // 1.5. Epic Games ise doğrudan resmi Epic Launcher URL protokolü ile başlat (Kısayol bağlantısı)
+                if (game.Platform.Equals("epic", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(game.StoreId))
+                {
+                    try
+                    {
+                        Process.Start(new ProcessStartInfo
+                        {
+                            FileName = $"com.epicgames.launcher://apps/{game.StoreId}?action=launch&silent=true",
+                            UseShellExecute = true
+                        });
+                        return (true, $"🚀 Epic Games üzerinden başlatılıyor: {game.Name}");
+                    }
+                    catch (Exception epEx)
+                    {
+                        Debug.WriteLine($"Epic protocol launch fallback: {epEx.Message}");
                     }
                 }
 

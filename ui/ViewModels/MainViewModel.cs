@@ -136,7 +136,31 @@ namespace Odzen.Avalonia.ViewModels
         [ObservableProperty] private string _txtDownloadOnlineLogosDesc = "Steam Store ve açık medya ağlarından şeffaf 4K logoları bir kez indirip bilgisayara kaydeder";
         [ObservableProperty] private string _txtRefreshAllLogos = "Tüm Logoları Çevrimiçi Yenile";
         [ObservableProperty] private string _txtRefreshAllLogosDesc = "Kütüphanedeki tüm oyunlar için açık sunuculardan en güncel logoları sıfırdan indirir";
-        [ObservableProperty] private string _txtRefreshLogosBtn = "Logoları Yenile";
+        [ObservableProperty] private string _txtRefreshLogosBtn = "Tümünü Yenile";
+        [ObservableProperty] private string _txtDownloadMissingLogos = "Yalnızca Eksikleri İndir";
+        [ObservableProperty] private string _txtOpenLogoFolder = "Klasörü Aç";
+        [ObservableProperty] private string _txtClearLogoCache = "Önbelleği Temizle";
+        [ObservableProperty] private string _txtSourcesTitle = "Arama Kaynakları:";
+        [ObservableProperty] private string _txtSteamGridDbKeyPlaceholder = "SteamGridDB API Anahtarı (İsteğe bağlı)...";
+        [ObservableProperty] private string _logoCacheSizeText = "0 B";
+        [ObservableProperty] private bool _useSteamSource = true;
+        [ObservableProperty] private bool _useWikimediaSource = true;
+        [ObservableProperty] private bool _useSteamGridDbSource = true;
+        [ObservableProperty] private string _steamGridDbApiKey = "";
+        [ObservableProperty] private bool _isLogoDownloading = false;
+        [ObservableProperty] private double _logoDownloadProgress = 0;
+        [ObservableProperty] private string _logoDownloadStatusText = "";
+        [ObservableProperty] private bool _isLogoPickerOpen = false;
+        [ObservableProperty] private string _logoPickerSearchQuery = "";
+        [ObservableProperty] private string _logoPickerCustomUrl = "";
+        [ObservableProperty] private bool _isLogoPickerLoading = false;
+        [ObservableProperty] private string _txtSearchAndPickLogo = "Çevrimiçi Ara & Seç";
+        [ObservableProperty] private string _txtLogoPickerTitle = "Çevrimiçi Logo Arama & Seçim Paneli";
+        [ObservableProperty] private string _txtPasteLogoUrl = "Görsel Bağlantısı (URL) Yapıştır";
+        [ObservableProperty] private string _txtApplyUrl = "Uygula";
+        [ObservableProperty] private string _txtCandidatesFound = "Bulunan Logo Adayları";
+        [ObservableProperty] private string _txtNoCandidates = "Uygun logo bulunamadı. Lütfen arama terimini değiştirin veya doğrudan bir görsel URL'si yapıştırın.";
+        public ObservableCollection<LogoCandidate> LogoCandidates { get; } = new();
         [ObservableProperty] private string _txtAiEngine = "Otomatik Oyun Algılama";
         [ObservableProperty] private string _txtAiDetection = "Çalışan Oyunları Algıla";
         [ObservableProperty] private string _txtAiDetectionDesc = "Arka planda yeni bir oyun açıldığında bildirim gösterir ve kütüphanenize tek tıkla eklemenizi sağlar.";
@@ -321,7 +345,47 @@ namespace Odzen.Avalonia.ViewModels
             _cpuThreshold = s.CpuThreshold;
             _gpuThreshold = s.GpuThreshold;
             _autostart = s.AutostartWithWindows;
+            _useSteamSource = s.UseSteamSource;
+            _useWikimediaSource = s.UseWikimediaSource;
+            _useSteamGridDbSource = s.UseSteamGridDbSource;
+            _steamGridDbApiKey = s.SteamGridDbApiKey ?? "";
+            OpenArtworkPipelineEngine.EnableSteamSource = s.UseSteamSource;
+            OpenArtworkPipelineEngine.EnableWikimediaSource = s.UseWikimediaSource;
+            OpenArtworkPipelineEngine.EnableSteamGridDbSource = s.UseSteamGridDbSource;
+            SteamGridDBLogoEngine.CustomApiKey = s.SteamGridDbApiKey;
+            UpdateLogoCacheSize();
             ArtworkPipelineService.IsOnlineDownloadEnabled = s.DownloadOnlineLogos;
+        }
+
+        public string ClearCacheButtonText => $"{TxtClearLogoCache} ({LogoCacheSizeText})";
+        public string LogoDownloadPercentText => $"%{(int)Math.Round(LogoDownloadProgress)}";
+
+        partial void OnLogoCacheSizeTextChanged(string value) => OnPropertyChanged(nameof(ClearCacheButtonText));
+        partial void OnTxtClearLogoCacheChanged(string value) => OnPropertyChanged(nameof(ClearCacheButtonText));
+        partial void OnLogoDownloadProgressChanged(double value) => OnPropertyChanged(nameof(LogoDownloadPercentText));
+
+        partial void OnSteamGridDbApiKeyChanged(string value)
+        {
+            SteamGridDBLogoEngine.CustomApiKey = value;
+            SaveCurrentSettings();
+        }
+
+        partial void OnUseSteamSourceChanged(bool value)
+        {
+            OpenArtworkPipelineEngine.EnableSteamSource = value;
+            SaveCurrentSettings();
+        }
+
+        partial void OnUseWikimediaSourceChanged(bool value)
+        {
+            OpenArtworkPipelineEngine.EnableWikimediaSource = value;
+            SaveCurrentSettings();
+        }
+
+        partial void OnUseSteamGridDbSourceChanged(bool value)
+        {
+            OpenArtworkPipelineEngine.EnableSteamGridDbSource = value;
+            SaveCurrentSettings();
         }
 
         public void SaveCurrentSettings()
@@ -338,6 +402,10 @@ namespace Odzen.Avalonia.ViewModels
                 Metin2 = Metin2,
                 SmartDetection = AiDetection,
                 DownloadOnlineLogos = FetchLogosFromInternet,
+                UseSteamSource = UseSteamSource,
+                UseWikimediaSource = UseWikimediaSource,
+                UseSteamGridDbSource = UseSteamGridDbSource,
+                SteamGridDbApiKey = SteamGridDbApiKey,
                 CpuThreshold = (int)CpuThreshold,
                 GpuThreshold = (int)GpuThreshold,
                 AutostartWithWindows = Autostart
@@ -1148,21 +1216,161 @@ namespace Odzen.Avalonia.ViewModels
             ShowToastNotification(message);
         }
 
-        [RelayCommand]
-        public async Task RefreshOnlineLogosAsync()
+        public void UpdateLogoCacheSize()
         {
-            ShowToastNotification("🌐 Steam Store ve Açık Medya Ağlarından logolar taranıyor...");
+            try
+            {
+                long totalBytes = 0;
+                string artworkLogos = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ODZEN", "artwork", "logos");
+                string sgdbLogos = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ODZEN", "steamgriddb_logos");
+
+                if (Directory.Exists(artworkLogos))
+                {
+                    var di = new DirectoryInfo(artworkLogos);
+                    foreach (var fi in di.EnumerateFiles()) totalBytes += fi.Length;
+                }
+                if (Directory.Exists(sgdbLogos))
+                {
+                    var di = new DirectoryInfo(sgdbLogos);
+                    foreach (var fi in di.EnumerateFiles()) totalBytes += fi.Length;
+                }
+
+                if (totalBytes < 1024)
+                    LogoCacheSizeText = $"{totalBytes} B";
+                else if (totalBytes < 1024 * 1024)
+                    LogoCacheSizeText = $"{(totalBytes / 1024.0):F1} KB";
+                else
+                    LogoCacheSizeText = $"{(totalBytes / (1024.0 * 1024.0)):F1} MB";
+            }
+            catch
+            {
+                LogoCacheSizeText = "0 B";
+            }
+        }
+
+        [RelayCommand]
+        public void OpenLogoFolder()
+        {
+            try
+            {
+                string folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ODZEN", "artwork", "logos");
+                if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
+                Process.Start(new ProcessStartInfo { FileName = folder, UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                ShowToastNotification($"Klasör açılamadı: {ex.Message}");
+            }
+        }
+
+        [RelayCommand]
+        public void ClearLogoCache()
+        {
+            try
+            {
+                string artworkLogos = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ODZEN", "artwork", "logos");
+                string sgdbLogos = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ODZEN", "steamgriddb_logos");
+
+                int count = 0;
+                if (Directory.Exists(artworkLogos))
+                {
+                    foreach (var f in Directory.GetFiles(artworkLogos))
+                    {
+                        try { File.Delete(f); count++; } catch { }
+                    }
+                }
+                if (Directory.Exists(sgdbLogos))
+                {
+                    foreach (var f in Directory.GetFiles(sgdbLogos))
+                    {
+                        try { File.Delete(f); count++; } catch { }
+                    }
+                }
+
+                ArtworkPipelineService.ClearCache();
+                foreach (var g in AllGames)
+                {
+                    g.NotifyIconChanged();
+                }
+                ApplyFilter();
+                UpdateLogoCacheSize();
+                ShowToastNotification(SelectedLanguageIndex == 0 ? $"🗑️ Tüm logo önbelleği temizlendi ({count} dosya)." : $"🗑️ All logo cache cleared ({count} files).");
+            }
+            catch (Exception ex)
+            {
+                ShowToastNotification($"Hata: {ex.Message}");
+            }
+        }
+
+        [RelayCommand]
+        public async Task DownloadMissingLogosAsync()
+        {
+            if (IsLogoDownloading) return;
+            var missing = AllGames.Where(g => !OpenArtworkPipelineEngine.HasLogo(g.Id) && !SteamGridDBLogoEngine.HasLogo(g.Id)).ToList();
+
+            if (missing.Count == 0)
+            {
+                ShowToastNotification(SelectedLanguageIndex == 0 ? "✅ Kütüphanedeki tüm oyunların logoları zaten hazır!" : "✅ All library games already have logos!");
+                return;
+            }
+
+            IsLogoDownloading = true;
+            LogoDownloadProgress = 0;
+            LogoDownloadStatusText = SelectedLanguageIndex == 0 ? $"Eksik logolar taranıyor (0/{missing.Count})..." : $"Scanning missing logos (0/{missing.Count})...";
+
             ArtworkPipelineService.ClearCache();
 
-            foreach (var g in AllGames)
+            for (int i = 0; i < missing.Count; i++)
             {
+                var g = missing[i];
+                LogoDownloadStatusText = SelectedLanguageIndex == 0 
+                    ? $"İndiriliyor ({i + 1}/{missing.Count}): {g.Name}" 
+                    : $"Downloading ({i + 1}/{missing.Count}): {g.Name}";
+                LogoDownloadProgress = (double)(i + 1) / missing.Count * 100.0;
+
                 await OpenArtworkPipelineEngine.ResolveAndDownloadLogoAsync(g.Id, g.Name, g.Platform, g.StoreId);
                 g.NotifyIconChanged();
             }
 
             ArtworkPipelineService.ClearCache();
             ApplyFilter();
-            ShowToastNotification("✅ Tüm oyun logoları açık kaynaklardan başarıyla güncellendi!");
+            UpdateLogoCacheSize();
+            IsLogoDownloading = false;
+            ShowToastNotification(SelectedLanguageIndex == 0 ? "✅ Eksik logolar başarıyla indirildi!" : "✅ Missing logos successfully downloaded!");
+        }
+
+        [RelayCommand]
+        public async Task RefreshOnlineLogosAsync()
+        {
+            if (IsLogoDownloading) return;
+            if (AllGames.Count == 0) return;
+
+            IsLogoDownloading = true;
+            LogoDownloadProgress = 0;
+            LogoDownloadStatusText = SelectedLanguageIndex == 0 ? $"Tüm logolar taranıyor (0/{AllGames.Count})..." : $"Scanning all logos (0/{AllGames.Count})...";
+
+            ArtworkPipelineService.ClearCache();
+
+            for (int i = 0; i < AllGames.Count; i++)
+            {
+                var g = AllGames[i];
+                LogoDownloadStatusText = SelectedLanguageIndex == 0 
+                    ? $"İndiriliyor ({i + 1}/{AllGames.Count}): {g.Name}" 
+                    : $"Downloading ({i + 1}/{AllGames.Count}): {g.Name}";
+                LogoDownloadProgress = (double)(i + 1) / AllGames.Count * 100.0;
+
+                string path = OpenArtworkPipelineEngine.GetLogoPath(g.Id);
+                if (File.Exists(path)) { try { File.Delete(path); } catch { } }
+
+                await OpenArtworkPipelineEngine.ResolveAndDownloadLogoAsync(g.Id, g.Name, g.Platform, g.StoreId);
+                g.NotifyIconChanged();
+            }
+
+            ArtworkPipelineService.ClearCache();
+            ApplyFilter();
+            UpdateLogoCacheSize();
+            IsLogoDownloading = false;
+            ShowToastNotification(SelectedLanguageIndex == 0 ? "✅ Tüm logolar açık kaynaklardan başarıyla güncellendi!" : "✅ All logos refreshed from open sources!");
         }
 
         [RelayCommand]
@@ -1299,7 +1507,15 @@ namespace Odzen.Avalonia.ViewModels
             if (SelectedGame == null) return;
             SelectedGame.CustomLogoPath = null;
             SelectedGame.PreferOnlineLogo = true;
+
+            // Önceki indirilmiş logo dosyasını diskten silerek taze arama tetikle
+            string logoPath = OpenArtworkPipelineEngine.GetLogoPath(SelectedGame.Id);
+            if (File.Exists(logoPath))
+            {
+                try { File.Delete(logoPath); } catch { }
+            }
             ArtworkPipelineService.ClearCache();
+
             OpenArtworkPipelineEngine.QueueDownload(SelectedGame.Id, SelectedGame.Name, SelectedGame.Platform, SelectedGame.StoreId, () =>
             {
                 Dispatcher.UIThread.Post(() =>
@@ -1309,7 +1525,94 @@ namespace Odzen.Avalonia.ViewModels
                 });
             });
             SelectedGame.NotifyIconChanged();
-            ShowToastNotification(SelectedLanguageIndex == 0 ? "🌐 Çevrimiçi Online HD/4K logoya geçildi." : "🌐 Switched to Online HD/4K Logo.");
+            ShowToastNotification(SelectedLanguageIndex == 0 ? "🌐 Çevrimiçi logo taranıyor ve güncelleniyor..." : "🌐 Fetching online logo...");
+        }
+
+        [RelayCommand]
+        public async Task OpenLogoPickerAsync()
+        {
+            if (SelectedGame == null) return;
+            LogoPickerSearchQuery = SelectedGame.Name;
+            LogoPickerCustomUrl = "";
+            IsLogoPickerOpen = true;
+            await SearchLogoCandidatesAsync();
+        }
+
+        [RelayCommand]
+        public void CloseLogoPicker()
+        {
+            IsLogoPickerOpen = false;
+        }
+
+        [RelayCommand]
+        public async Task SearchLogoCandidatesAsync()
+        {
+            if (string.IsNullOrWhiteSpace(LogoPickerSearchQuery)) return;
+            IsLogoPickerLoading = true;
+            LogoCandidates.Clear();
+
+            try
+            {
+                var list = await OpenArtworkPipelineEngine.SearchLogoCandidatesAsync(LogoPickerSearchQuery, SelectedGame?.Publisher);
+                foreach (var c in list)
+                {
+                    LogoCandidates.Add(c);
+                }
+            }
+            catch { }
+            finally
+            {
+                IsLogoPickerLoading = false;
+            }
+        }
+
+        [RelayCommand]
+        public async Task SelectLogoCandidateAsync(LogoCandidate? candidate)
+        {
+            if (candidate == null || SelectedGame == null) return;
+
+            string targetPath = OpenArtworkPipelineEngine.GetLogoPath(SelectedGame.Id);
+            bool ok = await OpenArtworkPipelineEngine.SaveCustomLogoFromUrlAsync(SelectedGame.Id, candidate.DownloadUrl);
+            if (ok)
+            {
+                SelectedGame.CustomLogoPath = targetPath;
+                SelectedGame.PreferOnlineLogo = true;
+                ArtworkPipelineService.ClearCache();
+                SelectedGame.NotifyIconChanged();
+                ApplyFilter();
+                UpdateLogoCacheSize();
+                IsLogoPickerOpen = false;
+                ShowToastNotification(SelectedLanguageIndex == 0 ? $"✅ Logo başarıyla uygulandı: {candidate.Title}" : $"✅ Logo applied: {candidate.Title}");
+            }
+            else
+            {
+                ShowToastNotification(SelectedLanguageIndex == 0 ? "❌ Logo indirilemedi veya geçersiz format." : "❌ Failed to download logo.");
+            }
+        }
+
+        [RelayCommand]
+        public async Task ApplyCustomLogoUrlAsync()
+        {
+            if (SelectedGame == null || string.IsNullOrWhiteSpace(LogoPickerCustomUrl)) return;
+            string url = LogoPickerCustomUrl.Trim();
+
+            string targetPath = OpenArtworkPipelineEngine.GetLogoPath(SelectedGame.Id);
+            bool ok = await OpenArtworkPipelineEngine.SaveCustomLogoFromUrlAsync(SelectedGame.Id, url);
+            if (ok)
+            {
+                SelectedGame.CustomLogoPath = targetPath;
+                SelectedGame.PreferOnlineLogo = true;
+                ArtworkPipelineService.ClearCache();
+                SelectedGame.NotifyIconChanged();
+                ApplyFilter();
+                UpdateLogoCacheSize();
+                IsLogoPickerOpen = false;
+                ShowToastNotification(SelectedLanguageIndex == 0 ? "✅ Özel logo bağlantısı başarıyla uygulandı!" : "✅ Custom logo applied from URL!");
+            }
+            else
+            {
+                ShowToastNotification(SelectedLanguageIndex == 0 ? "❌ Geçersiz görsel URL'si veya indirilemedi." : "❌ Invalid image URL or download failed.");
+            }
         }
 
         [RelayCommand]
@@ -1379,6 +1682,7 @@ namespace Odzen.Avalonia.ViewModels
                     TxtChangeLogo = "Logo ändern";
                     TxtSystemLogo = "System-Logo";
                     TxtOnlineLogo = "Online-Logo";
+                    TxtSearchAndPickLogo = "Online suchen & wählen";
                     TxtLaunchArgs = "STARTPARAMETER (ARGS)";
                     TxtQuickLaunch = "SCHNELLSTART / VERKNÜPFUNGSBEFEHL";
                     TxtFolder = "Ordner";
@@ -1413,7 +1717,12 @@ namespace Odzen.Avalonia.ViewModels
                     TxtDownloadOnlineLogosDesc = "Lädt transparente 4K-Logos aus dem Steam Store herunter";
                     TxtRefreshAllLogos = "Alle Logos online aktualisieren";
                     TxtRefreshAllLogosDesc = "Lädt die neuesten Logos für alle Bibliotheksspiele neu herunter";
-                    TxtRefreshLogosBtn = "Logos aktualisieren";
+                    TxtRefreshLogosBtn = "Alle aktualisieren";
+                    TxtDownloadMissingLogos = "Nur fehlende laden";
+                    TxtOpenLogoFolder = "Ordner öffnen";
+                    TxtClearLogoCache = "Cache leeren";
+                    TxtSourcesTitle = "Suchquellen:";
+                    TxtSteamGridDbKeyPlaceholder = "SteamGridDB API-Schlüssel (Optional)...";
                     TxtAiEngine = "Intelligente Hintergrund-Spielerkennung";
                     TxtAiDetection = "Intelligente Spielerkennung (Hintergrund)";
                     TxtAiDetectionDesc = "Erkennt neue Spiele im Hintergrund über Systemressourcen und bittet um Bestätigung zur Aufnahme in die Bibliothek.";
@@ -1465,6 +1774,7 @@ namespace Odzen.Avalonia.ViewModels
                     TxtChangeLogo = "Смяна на лого";
                     TxtSystemLogo = "Системно лого";
                     TxtOnlineLogo = "Онлайн лого";
+                    TxtSearchAndPickLogo = "Търси онлайн & избери";
                     TxtLaunchArgs = "ПАРАМЕТРИ ЗА СТАРТИРАНЕ (ARGS)";
                     TxtQuickLaunch = "БЪРЗ СТАРТ / КОМАНДА ЗА ПРЯК ПЪТ";
                     TxtFolder = "Папка";
@@ -1499,7 +1809,12 @@ namespace Odzen.Avalonia.ViewModels
                     TxtDownloadOnlineLogosDesc = "Изтегля прозрачни 4K лога от Steam Store";
                     TxtRefreshAllLogos = "Обновяване на всички лога онлайн";
                     TxtRefreshAllLogosDesc = "Изтегля наново най-новите лога за всички игри";
-                    TxtRefreshLogosBtn = "Обнови логата";
+                    TxtRefreshLogosBtn = "Обнови всички";
+                    TxtDownloadMissingLogos = "Само липсващи";
+                    TxtOpenLogoFolder = "Отвори папка";
+                    TxtClearLogoCache = "Изчисти кеша";
+                    TxtSourcesTitle = "Източници на търсене:";
+                    TxtSteamGridDbKeyPlaceholder = "SteamGridDB API ключ (По избор)...";
                     TxtAiEngine = "Интелигентно фоново откриване на игри";
                     TxtAiDetection = "Интелигентно откриване на игри (Фон)";
                     TxtAiDetectionDesc = "Открива нови игри във фонов режим чрез системни ресурси и пита за добавяне в библиотеката.";
@@ -1551,6 +1866,7 @@ namespace Odzen.Avalonia.ViewModels
                     TxtChangeLogo = "Cambiar logo";
                     TxtSystemLogo = "Logo del sistema";
                     TxtOnlineLogo = "Logo en línea";
+                    TxtSearchAndPickLogo = "Buscar en línea y elegir";
                     TxtLaunchArgs = "PARÁMETROS DE LANZAMIENTO (ARGS)";
                     TxtQuickLaunch = "LANZAMIENTO RÁPIDO / COMANDO DE ACCESO DIRECTO";
                     TxtFolder = "Carpeta";
@@ -1585,7 +1901,12 @@ namespace Odzen.Avalonia.ViewModels
                     TxtDownloadOnlineLogosDesc = "Descarga logos 4K transparentes desde Steam Store";
                     TxtRefreshAllLogos = "Actualizar todos los logos en línea";
                     TxtRefreshAllLogosDesc = "Descarga de nuevo los logos más recientes para todos los juegos";
-                    TxtRefreshLogosBtn = "Actualizar logos";
+                    TxtRefreshLogosBtn = "Actualizar todos";
+                    TxtDownloadMissingLogos = "Descargar solo faltantes";
+                    TxtOpenLogoFolder = "Abrir carpeta";
+                    TxtClearLogoCache = "Limpiar caché";
+                    TxtSourcesTitle = "Fuentes de búsqueda:";
+                    TxtSteamGridDbKeyPlaceholder = "Clave API SteamGridDB (Opcional)...";
                     TxtAiEngine = "Detección inteligente de juegos en segundo plano";
                     TxtAiDetection = "Detección inteligente de juegos (Segundo plano)";
                     TxtAiDetectionDesc = "Detecta nuevos juegos en segundo plano mediante recursos del sistema y solicita confirmación para agregarlos.";
@@ -1637,6 +1958,7 @@ namespace Odzen.Avalonia.ViewModels
                     TxtChangeLogo = "Logo wijzigen";
                     TxtSystemLogo = "Systeemlogo";
                     TxtOnlineLogo = "Online logo";
+                    TxtSearchAndPickLogo = "Online zoeken & kiezen";
                     TxtLaunchArgs = "OPSTARTPARAMETERS (ARGS)";
                     TxtQuickLaunch = "SNELSTART / SNELKOPPELINGSOPDRACHT";
                     TxtFolder = "Map";
@@ -1671,7 +1993,12 @@ namespace Odzen.Avalonia.ViewModels
                     TxtDownloadOnlineLogosDesc = "Downloadt transparante 4K-logo's van Steam Store";
                     TxtRefreshAllLogos = "Alle logo's online vernieuwen";
                     TxtRefreshAllLogosDesc = "Downloadt opnieuw de nieuwste logo's voor alle games";
-                    TxtRefreshLogosBtn = "Logo's vernieuwen";
+                    TxtRefreshLogosBtn = "Alles vernieuwen";
+                    TxtDownloadMissingLogos = "Alleen ontbrekende";
+                    TxtOpenLogoFolder = "Map openen";
+                    TxtClearLogoCache = "Cache wissen";
+                    TxtSourcesTitle = "Zoekbronnen:";
+                    TxtSteamGridDbKeyPlaceholder = "SteamGridDB API-sleutel (Optioneel)...";
                     TxtAiEngine = "Slimme achtergrond gamedetectie";
                     TxtAiDetection = "Slimme gamedetectie (Achtergrond)";
                     TxtAiDetectionDesc = "Detecteert nieuwe games op de achtergrond via systeembronnen en vraagt bevestiging om toe te voegen.";
@@ -1723,6 +2050,7 @@ namespace Odzen.Avalonia.ViewModels
                     TxtChangeLogo = "Changer de logo";
                     TxtSystemLogo = "Logo système";
                     TxtOnlineLogo = "Logo en ligne";
+                    TxtSearchAndPickLogo = "Rechercher et choisir";
                     TxtLaunchArgs = "PARAMÈTRES DE LANCEMENT (ARGS)";
                     TxtQuickLaunch = "LANCEMENT RAPIDE / COMMANDE DE RACCOURCI";
                     TxtFolder = "Dossier";
@@ -1757,7 +2085,12 @@ namespace Odzen.Avalonia.ViewModels
                     TxtDownloadOnlineLogosDesc = "Télécharge des logos 4K transparents depuis Steam Store";
                     TxtRefreshAllLogos = "Actualiser tous les logos en ligne";
                     TxtRefreshAllLogosDesc = "Télécharge à nouveau les derniers logos pour tous les jeux";
-                    TxtRefreshLogosBtn = "Actualiser les logos";
+                    TxtRefreshLogosBtn = "Tout actualiser";
+                    TxtDownloadMissingLogos = "Télécharger manquants";
+                    TxtOpenLogoFolder = "Ouvrir dossier";
+                    TxtClearLogoCache = "Vider le cache";
+                    TxtSourcesTitle = "Sources de recherche :";
+                    TxtSteamGridDbKeyPlaceholder = "Clé API SteamGridDB (Optionnel)...";
                     TxtAiEngine = "Détection intelligente de jeux en arrière-plan";
                     TxtAiDetection = "Détection intelligente de jeux (Arrière-plan)";
                     TxtAiDetectionDesc = "Détecte les nouveaux jeux en arrière-plan via les ressources système et demande confirmation.";
@@ -1809,6 +2142,7 @@ namespace Odzen.Avalonia.ViewModels
                     TxtChangeLogo = "Изменить логотип";
                     TxtSystemLogo = "Системный логотип";
                     TxtOnlineLogo = "Онлайн-логотип";
+                    TxtSearchAndPickLogo = "Искать онлайн и выбрать";
                     TxtLaunchArgs = "ПАРАМЕТРЫ ЗАПУСКА (ARGS)";
                     TxtQuickLaunch = "БЫСТРЫЙ ЗАПУСК / КОМАНДА ЯРЛЫКА";
                     TxtFolder = "Папка";
@@ -1843,7 +2177,12 @@ namespace Odzen.Avalonia.ViewModels
                     TxtDownloadOnlineLogosDesc = "Загружает прозрачные 4K логотипы из Steam Store";
                     TxtRefreshAllLogos = "Обновить все логотипы онлайн";
                     TxtRefreshAllLogosDesc = "Заново загружает актуальные логотипы для всех игр библиотеки";
-                    TxtRefreshLogosBtn = "Обновить логотипы";
+                    TxtRefreshLogosBtn = "Обновить все";
+                    TxtDownloadMissingLogos = "Только недостающие";
+                    TxtOpenLogoFolder = "Открыть папку";
+                    TxtClearLogoCache = "Очистить кэш";
+                    TxtSourcesTitle = "Источники поиска:";
+                    TxtSteamGridDbKeyPlaceholder = "API ключ SteamGridDB (Необязательно)...";
                     TxtAiEngine = "Умное фоновое обнаружение игр";
                     TxtAiDetection = "Умное обнаружение игр (Фоновое)";
                     TxtAiDetectionDesc = "Определяет новые игры в фоновом режиме по системным ресурсам и запрашивает подтверждение.";
@@ -1895,6 +2234,7 @@ namespace Odzen.Avalonia.ViewModels
                     TxtChangeLogo = "Change Logo";
                     TxtSystemLogo = "System Logo";
                     TxtOnlineLogo = "Online Logo";
+                    TxtSearchAndPickLogo = "Search Online & Pick";
                     TxtLaunchArgs = "LAUNCH ARGUMENTS (ARGS)";
                     TxtQuickLaunch = "QUICK LAUNCH / SHORTCUT COMMAND";
                     TxtFolder = "Folder";
@@ -1929,7 +2269,12 @@ namespace Odzen.Avalonia.ViewModels
                     TxtDownloadOnlineLogosDesc = "Downloads transparent 4K logos from Steam Store and open media networks";
                     TxtRefreshAllLogos = "Refresh All Logos Online";
                     TxtRefreshAllLogosDesc = "Downloads the latest logos for all library games";
-                    TxtRefreshLogosBtn = "Refresh Logos";
+                    TxtRefreshLogosBtn = "Refresh All";
+                    TxtDownloadMissingLogos = "Download Missing Only";
+                    TxtOpenLogoFolder = "Open Folder";
+                    TxtClearLogoCache = "Clear Cache";
+                    TxtSourcesTitle = "Search Sources:";
+                    TxtSteamGridDbKeyPlaceholder = "SteamGridDB API Key (Optional)...";
                     TxtAiEngine = "Automatic Game Detection";
                     TxtAiDetection = "Detect Running Games";
                     TxtAiDetectionDesc = "Shows a prompt when a new game starts in background to add it to your library.";
@@ -1981,6 +2326,7 @@ namespace Odzen.Avalonia.ViewModels
                     TxtChangeLogo = "Logo Değiştir";
                     TxtSystemLogo = "Sistem Logosu";
                     TxtOnlineLogo = "Online Logo";
+                    TxtSearchAndPickLogo = "Çevrimiçi Ara & Seç";
                     TxtLaunchArgs = "BAŞLATMA PARAMETRELERİ (ARGS)";
                     TxtQuickLaunch = "HIZLI BAŞLATMA / KISAYOL KOMUTU";
                     TxtFolder = "Klasör";
@@ -2015,7 +2361,12 @@ namespace Odzen.Avalonia.ViewModels
                     TxtDownloadOnlineLogosDesc = "Steam Store ve açık medya ağlarından şeffaf 4K logoları bir kez indirip bilgisayara kaydeder";
                     TxtRefreshAllLogos = "Tüm Logoları Çevrimiçi Yenile";
                     TxtRefreshAllLogosDesc = "Kütüphanedeki tüm oyunlar için açık sunuculardan en güncel logoları sıfırdan indirir";
-                    TxtRefreshLogosBtn = "Logoları Yenile";
+                    TxtRefreshLogosBtn = "Tümünü Yenile";
+                    TxtDownloadMissingLogos = "Yalnızca Eksikleri İndir";
+                    TxtOpenLogoFolder = "Klasörü Aç";
+                    TxtClearLogoCache = "Önbelleği Temizle";
+                    TxtSourcesTitle = "Arama Kaynakları:";
+                    TxtSteamGridDbKeyPlaceholder = "SteamGridDB API Anahtarı (İsteğe bağlı)...";
                     TxtAiEngine = "Otomatik Oyun Algılama";
                     TxtAiDetection = "Çalışan Oyunları Algıla";
                     TxtAiDetectionDesc = "Arka planda yeni bir oyun açıldığında bildirim gösterir ve kütüphanenize tek tıkla eklemenizi sağlar.";

@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // ODZEN — Cybernetic Gaming Platform
 // Developed by Taroxzen (https://github.com/taroxzen)
 // Copyright (c) 2026 Taroxzen. All rights reserved.
@@ -30,10 +30,47 @@ namespace Odzen.Avalonia
                 };
 
                 desktop.MainWindow.Deactivated += (s, e) => Services.MemoryOptimizerService.TrimMemory();
+                desktop.Exit += (s, e) => Services.SingleInstanceService.ReleaseMutex();
             }
 
             Services.MemoryOptimizerService.Initialize();
             base.OnFrameworkInitializationCompleted();
+        }
+
+        public static void BringToForeground()
+        {
+            try
+            {
+                if (Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow != null)
+                {
+                    var window = desktop.MainWindow;
+
+                    if (!window.IsVisible)
+                    {
+                        window.Show();
+                    }
+
+                    if (window.WindowState == global::Avalonia.Controls.WindowState.Minimized)
+                    {
+                        window.WindowState = global::Avalonia.Controls.WindowState.Normal;
+                    }
+
+                    window.Activate();
+
+                    if (OperatingSystem.IsWindows())
+                    {
+                        var handle = window.TryGetPlatformHandle()?.Handle;
+                        if (handle.HasValue && handle.Value != IntPtr.Zero)
+                        {
+                            Services.SingleInstanceService.BringWindowToFront(handle.Value);
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // Sessizce yut
+            }
         }
 
         private void OnTrayIconClicked(object? sender, EventArgs e)
@@ -136,6 +173,7 @@ namespace Odzen.Avalonia
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
+                Services.SingleInstanceService.ReleaseMutex();
                 desktop.Shutdown();
             }
         }

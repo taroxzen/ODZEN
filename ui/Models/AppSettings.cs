@@ -17,6 +17,10 @@ namespace Odzen.Avalonia.Models
         public bool Metin2 { get; set; } = true;
         public bool SmartDetection { get; set; } = true;
         public bool DownloadOnlineLogos { get; set; } = true;
+        public bool UseSteamSource { get; set; } = true;
+        public bool UseWikimediaSource { get; set; } = true;
+        public bool UseSteamGridDbSource { get; set; } = true;
+        public string SteamGridDbApiKey { get; set; } = "";
         public bool ShowShowcase { get; set; } = true;
         public bool ShowMusicButton { get; set; } = true;
         public bool ShowDiscordButton { get; set; } = true;

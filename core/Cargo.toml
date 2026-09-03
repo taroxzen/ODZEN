@@ -1,6 +1,6 @@
 [package]
 name = "odzen-core"
-version = "1.3.0"
+version = "1.4.2"
 edition = "2024"
 authors = ["Taroxzen <https://github.com/taroxzen>"]
 description = "Unified Rust Core Engine for ODZEN (Scanner, Artwork, Launcher, System)"
@@ -29,10 +29,3 @@ image = { version = "0.25", default-features = false, features = ["png", "jpeg",
 
 [target.'cfg(windows)'.dependencies]
 winreg = "0.55"
-
-[profile.release]
-opt-level = 3
-lto = true
-codegen-units = 1
-panic = "abort"
-strip = true
